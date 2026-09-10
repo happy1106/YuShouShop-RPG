@@ -59,8 +59,8 @@ document.body.innerHTML = `
     <p>❤️ 生命：${enemy.hp}</p>
 
     <hr>
-     <button onclick="physicalAttack()">物攻</button>
-     <button>魔攻</button>
+     <button onclick= "physicalAttack()" >物攻</button>
+     <button onclick= "magicAttack()"    >魔攻</button>
      <button>防禦</button>
      <button>逃跑</button>
     `;
@@ -68,22 +68,15 @@ document.body.innerHTML = `
 
 function physicalAttack() {
     let damage = character.patk - enemy.pdef;
-
-    if (damage < 0) {
-        damage = 0;
-    }
-
+    if (damage < 0) {        damage = 0;    }
     enemy.hp -= damage;
 
     document.body.innerHTML = `
         <h1>戰鬥中</h1>
-
         <h2>${character.name} Lv.${character.level}</h2>
         <p>❤️ 生命：${character.hp}</p>
         <p>⚔️ 物攻：${character.patk}</p>
-
         <hr>
-
         <h2>${enemy.name} Lv.${enemy.level}</h2>
         <p>❤️ 生命：${enemy.hp}</p>
         <p>受到 ${damage} 點物理傷害！</p>
@@ -97,6 +90,32 @@ function physicalAttack() {
     `;
 }    
 
+function magicAttack() {
+    let damage = character.matk - enemy.mdef;
+
+    if (damage < 0) {        damage = 0;    }
+    enemy.hp -= damage;
+
+    document.body.innerHTML = `
+        <h1>戰鬥中</h1>
+        <h2>${character.name} Lv.${character.level}</h2>
+        <p>❤️ 生命：${character.hp}</p>
+        <p>🔮 魔攻：${character.matk}</p>
+
+        <hr>
+
+        <h2>${enemy.name} Lv.${enemy.level}</h2>
+        <p>❤️ 生命：${enemy.hp}</p>
+        <p>受到 ${damage} 點魔法傷害！</p>
+
+        <hr>
+
+        <button onclick="physicalAttack()">物攻</button>
+        <button onclick="magicAttack()"   >魔攻</button>
+        <button>防禦</button>
+        <button>逃跑</button>
+    `;
+}    
     
 
 
@@ -123,8 +142,8 @@ function gainExp(amount) {
     
     function levelUp() {
         character.level += 1;
-        character.  hp += 1;  character.patk += 1;        character.matk += 1;
-        character.pdef += 1;  character.mdef += 1;        character.spd += 1;
+        character.   hp += 1; character.patk += 1; character.matk += 1;
+        character. pdef += 1; character.mdef += 1; character.spd += 1;
         showDog();
     }
 
