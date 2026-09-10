@@ -14,7 +14,7 @@
 
 <script>
 
-    // 小犬資料
+    // 主角資料
 let character = {
     name: "小犬",
     level: 1,
@@ -26,19 +26,18 @@ let character = {
     spd: 6
 };
 
-    // 顯示小犬資料
+    // 顯示主角資料
     function showDog() {
         document.body.innerHTML = `
             <h1>我的小犬</h1>
 
-            <p>Lv.${dog.level}</p>
-
-            <p>❤️ 生命：${dog.hp}</p>
-            <p>⚔️ 物攻：${dog.patk}</p>
-            <p>🔮 魔攻：${dog.matk}</p>
-            <p>🛡️ 物防：${dog.pdef}</p>
-            <p>🧿 魔防：${dog.mdef}</p>
-            <p>💨 速度：${dog.spd}</p>
+            <p>Lv.${character.level}</p>
+            <p>❤️ 生命：${character.hp}    </p>
+            <p>⚔️ 物攻：${character.patk}    </p>
+            <p>🔮 魔攻：${character.matk}    </p>
+            <p>🛡️ 物防：${character.pdef}    </p>
+            <p>🧿 魔防：${character.mdef}    </p>
+            <p>💨 速度：${character.spd}    </p>
 
             <button onclick="levelUp()">升級</button>
         `;
@@ -49,16 +48,15 @@ let character = {
         showDog();
     }
 
-    // 小犬升級
+    // 主角升級
     function levelUp() {
-        dog.level += 1;
-
-        dog.hp += 1;
-        dog.patk += 1;
-        dog.matk += 1;
-        dog.pdef += 1;
-        dog.mdef += 1;
-        dog.spd += 1;
+        character.level += 1;
+        character.hp += 1;
+        character.patk += 1;
+        character.matk += 1;
+        character.pdef += 1;
+        character.mdef += 1;
+        character.spd += 1;
 
         showDog();
     }
