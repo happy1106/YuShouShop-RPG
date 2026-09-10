@@ -6,28 +6,15 @@
 
     <!-- 遊戲首頁 -->
     <h1>御獸小舖 RPG</h1>
-
     <p>歡迎來到御獸世界！</p>
-
     <button onclick="sayHello()">開始遊戲</button>
-
 
 <script>
 
     // 主角資料
 let character = {
-    name: "小犬",
-    level: 1,
-
-    exp: 0,
-    expMax: 100,
-    
-    hp: 6,
-    patk: 6,
-    matk: 6,
-    pdef: 6,
-    mdef: 6,
-    spd: 6
+    name: "小犬",    level: 1,    exp: 0,    expMax: 100,
+    hp: 6,    patk: 6,    matk: 6,    pdef: 6,    mdef: 6,    spd: 6
 };
 
     // 顯示主角資料
@@ -45,6 +32,7 @@ let character = {
             <p>💨 速度：${character.spd}    </p>
 
             <button onclick="levelUp()">升級</button>
+            <button onclick="gainExp(10); showDog()">獲得 10 EXP</button>
         `;
     }
 
@@ -54,6 +42,9 @@ let character = {
     }
 
     // 主角升級
+    function gainExp(amount) {
+    character.exp += amount;
+    }
     function levelUp() {
         character.level += 1;
         character.hp += 1;
