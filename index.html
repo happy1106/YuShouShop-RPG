@@ -15,29 +15,35 @@
 
 
     <script>
-        
-        let dog = {
-    level: 1,
-    hp: 6,
-    patk: 6,
-    matk: 6,
-    pdef: 6,
-    mdef: 6,
-    spd: 6
-};
-        // 開始遊戲
-        function sayHello() {
-            document.body.innerHTML = `
-                <h1>我的小犬</h1>
-                <p>Lv.1</p>
-                <p>❤️ 生命：6</p>
-                <p>⚔️ 物攻：6</p>
-                <p>🔮 魔攻：6</p>
-                <p>🛡️ 物防：6</p>
-                <p>🧿 魔防：6</p>
-                <p>💨 速度：6</p>
-            `;
-        }
+ 
+    // 小犬資料
+    let dog = {
+        level: 1,
+        hp: 6,
+        patk: 6,
+        matk: 6,
+        pdef: 6,
+        mdef: 6,
+        spd: 6
+    };
+
+    // 開始遊戲
+    function sayHello() {
+        document.body.innerHTML = `
+            <h1>我的小犬</h1>
+
+            <p>Lv.${dog.level}</p>
+
+            <p>❤️ 生命：${dog.hp}</p>
+            <p>⚔️ 物攻：${dog.patk}</p>
+            <p>🔮 魔攻：${dog.matk}</p>
+            <p>🛡️ 物防：${dog.pdef}</p>
+            <p>🧿 魔防：${dog.mdef}</p>
+            <p>💨 速度：${dog.spd}</p>
+        `;
+    }
+
+</script>
 
     </script>
 
