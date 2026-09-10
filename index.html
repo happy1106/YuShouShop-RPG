@@ -20,8 +20,8 @@ let character = {
 function showDog() {
 document.body.innerHTML = `
     <h1>我的小犬</h1>
-     <p>Lv.${character.level}</p>
-     <p>EXP：${character.exp} / ${character.expMax}</p>
+     <p>    Lv ：${character.level}</p>
+     <p>    EXP：${character.exp} / ${character.expMax}</p>
      <p>❤️ 生命：${character.hp}</p>
      <p>⚔️ 物攻：${character.patk}</p>
      <p>🔮 魔攻：${character.matk}</p>
@@ -39,14 +39,38 @@ document.body.innerHTML = `
     }
 
     // 主角升級
-    function gainExp(amount) {
+    function getExpMax(level) {
+
+    if (level <= 10) {
+        return 100 + (level - 1) * 10;
+    }
+
+    if (level <= 20) {
+        return 300 + (level - 11) * 50;
+    }
+
+    if (level <= 30) {
+        return 1000 + (level - 21) * 100;
+    }
+
+    return 4000 + (level - 31) * 500;
+    }
+
+
+    
+function gainExp(amount) {
     character.exp += amount;
 
     if (character.exp >= character.expMax) {
         character.exp -= character.expMax;
+
         levelUp();
+
+        character.expMax = getExpMax(character.level);
     }
-    }
+
+    showDog();
+}
     
     function levelUp() {
         character.level += 1;
