@@ -3,7 +3,6 @@
 <head><title>御獸小舖 RPG</title></head>
 
 <body>
-
     <!-- 遊戲首頁 -->
     <h1>御獸小舖 RPG</h1>
     <p>歡迎來到御獸世界！</p>
@@ -11,28 +10,27 @@
 
 <script>
 
-    // 主角資料
+// 主角資料
 let character = {
     name: "小犬",    level: 1,    exp: 0,    expMax: 100,
     hp: 6,    patk: 6,    matk: 6,    pdef: 6,    mdef: 6,    spd: 6
 };
 
-    // 顯示主角資料
-    function showDog() {
-        document.body.innerHTML = `
-            <h1>我的小犬</h1>
+// 顯示主角資料
+function showDog() {
+document.body.innerHTML = `
+    <h1>我的小犬</h1>
+     <p>Lv.${character.level}</p>
+     <p>EXP：${character.exp} / ${character.expMax}</p>
+     <p>❤️ 生命：${character.hp}</p>
+     <p>⚔️ 物攻：${character.patk}</p>
+     <p>🔮 魔攻：${character.matk}</p>
+     <p>🛡️ 物防：${character.pdef}</p>
+     <p>🧿 魔防：${character.mdef}</p>
+     <p>💨 速度：${character.spd}</p>
 
-            <p>Lv.${character.level}</p>
-            <p>EXP：${character.exp} / ${character.expMax}</p>
-            <p>❤️ 生命：${character.hp}    </p>
-            <p>⚔️ 物攻：${character.patk}    </p>
-            <p>🔮 魔攻：${character.matk}    </p>
-            <p>🛡️ 物防：${character.pdef}    </p>
-            <p>🧿 魔防：${character.mdef}    </p>
-            <p>💨 速度：${character.spd}    </p>
-
-            <button onclick="levelUp()">升級</button>
-            <button onclick="gainExp(10); showDog()">獲得 10 EXP</button>
+    <button onclick="levelUp()">升級</button>
+    <button onclick="gainExp(10); showDog()">獲得 10 EXP</button>
         `;
     }
 
@@ -44,7 +42,13 @@ let character = {
     // 主角升級
     function gainExp(amount) {
     character.exp += amount;
+
+    if (character.exp >= character.expMax) {
+        character.exp -= character.expMax;
+        levelUp();
     }
+    }
+    
     function levelUp() {
         character.level += 1;
         character.hp += 1;
