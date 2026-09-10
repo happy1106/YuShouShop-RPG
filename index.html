@@ -15,6 +15,11 @@ let character = {
     name: "小犬",    level: 1,    exp: 0,    expMax: 100,
     hp: 6,    patk: 6,    matk: 6,    pdef: 6,    mdef: 6,    spd: 6
 };
+let enemy = {
+    name: "赤焰狼",    level: 1,
+    hp: 10,    patk: 7,    matk: 5,    pdef: 6,    mdef: 5,    spd: 8
+};
+    
 
 // 顯示主角資料
 function showDog() {
@@ -30,6 +35,18 @@ document.body.innerHTML = `
      <p>💨 速度：${character.spd}</p>
 
     <button onclick="gainExp(10); showDog()">獲得 10 EXP</button>
+
+<hr>
+    <h2>野生寵獸</h2>
+    <p>${enemy.name} Lv.${enemy.level}</p>
+    <p>❤️ 生命：${enemy.hp}</p>
+    <p>⚔️ 物攻：${enemy.patk}</p>
+    <p>🔮 魔攻：${enemy.matk}</p>
+    <p>🛡️ 物防：${enemy.pdef}</p>
+    <p>🧿 魔防：${enemy.mdef}</p>
+    <p>💨 速度：${enemy.spd}</p>
+
+    
         `;
     }
 
