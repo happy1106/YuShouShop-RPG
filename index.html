@@ -26,24 +26,24 @@ function showDog() {
 document.body.innerHTML = `
     <h1>我的小犬</h1>
     <p>    Lv ：${character.level}</p>
-    <p>    EXP：${character.exp} / ${character.expMax}</p>
-    <p>❤️ 生命：${character.hp}</p>
+    <p>    EXP：${character. exp}  / ${character.expMax}</p>
+    <p>❤️ 生命：${character.  hp}</p>
     <p>⚔️ 物攻：${character.patk}</p>
     <p>🔮 魔攻：${character.matk}</p>
     <p>🛡️ 物防：${character.pdef}</p>
     <p>🧿 魔防：${character.mdef}</p>
-    <p>💨 速度：${character.spd}</p>
+    <p>💨 速度：${character. spd}</p>
     <button onclick="gainExp(10); showDog()">獲得 10 EXP</button>
 
 <hr>
     <h2>野生寵獸</h2>
     <p>${enemy.name} Lv.${enemy.level}</p>
-    <p>❤️ 生命：${enemy.hp}</p>
+    <p>❤️ 生命：${enemy.  hp}</p>
     <p>⚔️ 物攻：${enemy.patk}</p>
     <p>🔮 魔攻：${enemy.matk}</p>
     <p>🛡️ 物防：${enemy.pdef}</p>
     <p>🧿 魔防：${enemy.mdef}</p>
-    <p>💨 速度：${enemy.spd}</p>
+    <p>💨 速度：${enemy. spd}</p>
     <button onclick="startBattle()">開始戰鬥</button>
             `;
     }
@@ -59,13 +59,45 @@ document.body.innerHTML = `
     <p>❤️ 生命：${enemy.hp}</p>
 
     <hr>
-     <button>物攻</button>
+     <button onclick="physicalAttack()">物攻</button>
      <button>魔攻</button>
      <button>防禦</button>
      <button>逃跑</button>
     `;
 }
 
+function physicalAttack() {
+    let damage = character.patk - enemy.pdef;
+
+    if (damage < 0) {
+        damage = 0;
+    }
+
+    enemy.hp -= damage;
+
+    document.body.innerHTML = `
+        <h1>戰鬥中</h1>
+
+        <h2>${character.name} Lv.${character.level}</h2>
+        <p>❤️ 生命：${character.hp}</p>
+        <p>⚔️ 物攻：${character.patk}</p>
+
+        <hr>
+
+        <h2>${enemy.name} Lv.${enemy.level}</h2>
+        <p>❤️ 生命：${enemy.hp}</p>
+        <p>受到 ${damage} 點物理傷害！</p>
+
+        <hr>
+
+        <button onclick="physicalAttack()">物攻</button>
+        <button>魔攻</button>
+        <button>防禦</button>
+        <button>逃跑</button>
+    `;
+}    
+
+    
 
 
     
@@ -91,13 +123,8 @@ function gainExp(amount) {
     
     function levelUp() {
         character.level += 1;
-        character.hp += 1;
-        character.patk += 1;
-        character.matk += 1;
-        character.pdef += 1;
-        character.mdef += 1;
-        character.spd += 1;
-
+        character.  hp += 1;  character.patk += 1;        character.matk += 1;
+        character.pdef += 1;  character.mdef += 1;        character.spd += 1;
         showDog();
     }
 
