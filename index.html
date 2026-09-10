@@ -14,8 +14,8 @@
     <button onclick="sayHello()">開始遊戲</button>
 
 
-    <script>
- 
+<script>
+
     // 小犬資料
     let dog = {
         level: 1,
@@ -27,8 +27,8 @@
         spd: 6
     };
 
-    // 開始遊戲
-    function sayHello() {
+    // 顯示小犬資料
+    function showDog() {
         document.body.innerHTML = `
             <h1>我的小犬</h1>
 
@@ -40,12 +40,31 @@
             <p>🛡️ 物防：${dog.pdef}</p>
             <p>🧿 魔防：${dog.mdef}</p>
             <p>💨 速度：${dog.spd}</p>
+
+            <button onclick="levelUp()">升級</button>
         `;
     }
 
-</script>
+    // 開始遊戲
+    function sayHello() {
+        showDog();
+    }
 
-    </script>
+    // 小犬升級
+    function levelUp() {
+        dog.level += 1;
+
+        dog.hp += 1;
+        dog.patk += 1;
+        dog.matk += 1;
+        dog.pdef += 1;
+        dog.mdef += 1;
+        dog.spd += 1;
+
+        showDog();
+    }
+
+</script>
 
 </body>
 </html>
