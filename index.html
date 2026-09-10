@@ -25,15 +25,14 @@ let enemy = {
 function showDog() {
 document.body.innerHTML = `
     <h1>我的小犬</h1>
-     <p>    Lv ：${character.level}</p>
-     <p>    EXP：${character.exp} / ${character.expMax}</p>
-     <p>❤️ 生命：${character.hp}</p>
-     <p>⚔️ 物攻：${character.patk}</p>
-     <p>🔮 魔攻：${character.matk}</p>
-     <p>🛡️ 物防：${character.pdef}</p>
-     <p>🧿 魔防：${character.mdef}</p>
-     <p>💨 速度：${character.spd}</p>
-
+    <p>    Lv ：${character.level}</p>
+    <p>    EXP：${character.exp} / ${character.expMax}</p>
+    <p>❤️ 生命：${character.hp}</p>
+    <p>⚔️ 物攻：${character.patk}</p>
+    <p>🔮 魔攻：${character.matk}</p>
+    <p>🛡️ 物防：${character.pdef}</p>
+    <p>🧿 魔防：${character.mdef}</p>
+    <p>💨 速度：${character.spd}</p>
     <button onclick="gainExp(10); showDog()">獲得 10 EXP</button>
 
 <hr>
@@ -45,49 +44,50 @@ document.body.innerHTML = `
     <p>🛡️ 物防：${enemy.pdef}</p>
     <p>🧿 魔防：${enemy.mdef}</p>
     <p>💨 速度：${enemy.spd}</p>
+    <button onclick="startBattle()">開始戰鬥</button>
+            `;
+    }
 
+function startBattle() {
+document.body.innerHTML = `
+    <h1>戰鬥開始！</h1>
     
-        `;
-    }
+    <h2>${character.name} Lv.${character.level}</h2>
+    <p>❤️ 生命：${character.hp}</p>
+    <hr>
+    <h2>${enemy.name} Lv.${enemy.level}</h2>
+    <p>❤️ 生命：${enemy.hp}</p>
 
-    // 開始遊戲
-    function sayHello() {
-        showDog();
-    }
+    <hr>
+     <button>物攻</button>
+     <button>魔攻</button>
+     <button>防禦</button>
+     <button>逃跑</button>
+    `;
+}
 
-    // 主角升級
-    function getExpMax(level) {
-
-    if (level <= 10) {
-        return 100 + (level - 1) * 10;
-    }
-
-    if (level <= 20) {
-        return 300 + (level - 11) * 50;
-    }
-
-    if (level <= 30) {
-        return 1000 + (level - 21) * 100;
-    }
-
-    return 4000 + (level - 31) * 500;
-    }
 
 
     
+// 開始遊戲
+function sayHello() {        showDog();    }
+
+// 主角升級
+function getExpMax(level) {
+    if (level <= 10) {        return  100 + (level -  1) *  10;    }
+    if (level <= 20) {        return  300 + (level - 11) *  50;    }
+    if (level <= 30) {        return 1000 + (level - 21) * 100;    }
+                              return 4000 + (level - 31) * 500;    }
+   
 function gainExp(amount) {
     character.exp += amount;
-
     if (character.exp >= character.expMax) {
         character.exp -= character.expMax;
-
         levelUp();
-
         character.expMax = getExpMax(character.level);
     }
-
     showDog();
-}
+    }
     
     function levelUp() {
         character.level += 1;
