@@ -1,33 +1,26 @@
 <!DOCTYPE html>
 <html>
 <head><title>御獸小舖 RPG</title></head>
-
 <body>
     <!-- 遊戲首頁 -->
     <h1>御獸小舖 RPG</h1>
     <p>歡迎來到御獸世界！</p>
     <button onclick="sayHello()">開始遊戲</button>
-
 <script>
-
 // 主角資料
 let character = {
     name: "小犬",    level: 1,    exp: 0,    expMax: 100,
-    hp: 6,    patk: 6,    matk: 6,    pdef: 6,    mdef: 6,    spd: 6
-};
-let enemy = {
+    hp: 6,    patk: 6,    matk: 6,    pdef: 6,    mdef: 6,    spd: 6    }    ;
+let enemy     = {
     name: "赤焰狼",    level: 1,
-    hp: 10,    patk: 7,    matk: 5,    pdef: 6,    mdef: 5,    spd: 8
-};
-    
-
+    hp: 10,    patk: 7,    matk: 5,    pdef: 6,    mdef: 5,   spd: 8    }    ;
 // 顯示主角資料
 function showDog() {
 document.body.innerHTML = `
     <h1>我的小犬</h1>
     <p>    Lv ：${character.level}</p>
-    <p>    EXP：${character. exp}  / ${character.expMax}</p>
-    <p>❤️ 生命：${character.  hp}</p>
+    <p>    EXP：${character. exp}  /  ${character.expMax}</p>
+    <p id="characterHp">❤️ 生命：${character.hp}</p>
     <p>⚔️ 物攻：${character.patk}</p>
     <p>🔮 魔攻：${character.matk}</p>
     <p>🛡️ 物防：${character.pdef}</p>
@@ -44,109 +37,75 @@ document.body.innerHTML = `
     <p>🛡️ 物防：${enemy.pdef}</p>
     <p>🧿 魔防：${enemy.mdef}</p>
     <p>💨 速度：${enemy. spd}</p>
-    <button onclick="startBattle()">開始戰鬥</button>
-            `;
-    }
+    <button onclick="startBattle()">開始戰鬥</button>            `;    }
 
 function startBattle() {
 document.body.innerHTML = `
     <h1>戰鬥開始！</h1>
     
-    <h2>${character.name} Lv.${character.level}</h2>
+    <h2>${character.name}  Lv.${character.level}</h2>
     <p>❤️ 生命：${character.hp}</p>
     <hr>
-    <h2>${enemy.name} Lv.${enemy.level}</h2>
-    <p>❤️ 生命：${enemy.hp}</p>
+    <h2>${enemy.name}      Lv.${enemy.level}    </h2>
+    <p id="enemyHp">❤️ 生命：${enemy.hp}</p>
 
-    <hr>
-     <button onclick= "physicalAttack()" >物攻</button>
-     <button onclick= "magicAttack()"    >魔攻</button>
-     <button>防禦</button>
-     <button>逃跑</button>
-    `;
-}
+    <p id="battleMessage">請選擇行動</p>
 
-function physicalAttack() {
-    let damage = character.patk - enemy.pdef;
-    if (damage < 0) {        damage = 0;    }
-    enemy.hp -= damage;
-
-    document.body.innerHTML = `
-        <h1>戰鬥中</h1>
-        <h2>${character.name} Lv.${character.level}</h2>
-        <p>❤️ 生命：${character.hp}</p>
-        <p>⚔️ 物攻：${character.patk}</p>
-        <hr>
-        <h2>${enemy.name} Lv.${enemy.level}</h2>
-        <p>❤️ 生命：${enemy.hp}</p>
-        <p>受到 ${damage} 點物理傷害！</p>
-
-        <hr>
-
-        <button onclick= "physicalAttack()">物攻</button>
-        <button onclick= "magicAttack()"   >魔攻</button>
-        <button>防禦</button>
-        <button>逃跑</button>
-    `;
-}    
-
-function magicAttack() {
-    let damage = character.matk - enemy.mdef;
-    if (damage < 0) {        damage = 0;    }
-    enemy.hp -= damage;
-
-    document.body.innerHTML = `
-        <h1>戰鬥中</h1>
-        <h2>${character.name} Lv.${character.level}</h2>
-        <p>❤️ 生命：${character.hp}</p>
-        <p>🔮 魔攻：${character.matk}</p>
-
-        <hr>
-
-        <h2>${enemy.name} Lv.${enemy.level}</h2>
-        <p>❤️ 生命：${enemy.hp}</p>
-        <p>受到 ${damage} 點魔法傷害！</p>
-
-        <hr>
-
-        <button onclick="physicalAttack()">物攻</button>
-        <button onclick="magicAttack()"   >魔攻</button>
-        <button>防禦</button>
-        <button>逃跑</button>
-    `;
-}    
-    
+<hr>
+  <button onclick="attack(character, enemy, 'physical' )">物攻</button>
+  <button onclick="attack(character, enemy, 'magic'    )">魔攻</button>
+  
+  <button onclick="defend         (  )">防禦</button>
+  <button onclick="escape         (  )">逃跑</button> `;    }
 
 
-    
+function attack(attacker, defender, type) {
+    let attack;    let defense;  let message;
+    if     (type === "physical" ) {
+        attack = attacker.patk; defense = defender.pdef;  message = "物理";    }
+    else if(type === "magic"    ) {
+        attack = attacker.matk; defense = defender.mdef;  message = "魔法";    }
+    else {    return        ;    }
+    let damage = calculateDamage(attack, defense);    defender.hp -= damage;
+  document.getElementById("enemyHp"      ).innerHTML =
+        `❤️ 生命：${enemy.hp}            `;
+  document.getElementById("characterHp"  ).innerHTML =
+        `❤️ 生命：${character.hp}        `;
+  document.getElementById("battleMessage").innerHTML =
+        `${attacker.name} 對 ${defender.name} 造成 ${damage} 點${message}傷害！`;}
+
+function calculateDamage(attack, defense) {
+    let damage = attack - defense;
+    if (damage < 0) {        damage = 0;  }
+    return damage                      ;  }
+
+function enemyAttack() {
+    let damage = calculateDamage(enemy.patk, character.pdef);
+    character.hp -= damage;
+    document.getElementById("characterHp")  .innerHTML =
+        `❤️ 生命：${character.hp}`;
+    document.getElementById("battleMessage").innerHTML =
+        `${enemy.name} 對你造成 ${damage} 點物理傷害！`;  }
+
+
+  
 // 開始遊戲
 function sayHello() {        showDog();    }
-
 // 主角升級
 function getExpMax(level) {
     if (level <= 10) {        return  100 + (level -  1) *  10;    }
     if (level <= 20) {        return  300 + (level - 11) *  50;    }
     if (level <= 30) {        return 1000 + (level - 21) * 100;    }
-                              return 4000 + (level - 31) * 500;    }
-   
+                              return 4000 + (level - 31) * 500;    } 
 function gainExp(amount) {
     character.exp += amount;
     if (character.exp >= character.expMax) {
         character.exp -= character.expMax;
         levelUp();
-        character.expMax = getExpMax(character.level);
-    }
-    showDog();
-    }
-    
-    function levelUp() {
-        character.level += 1;
-        character.   hp += 1; character.patk += 1; character.matk += 1;
-        character. pdef += 1; character.mdef += 1; character.spd += 1;
-        showDog();
-    }
+        character.expMax = getExpMax(character.level)        ;    }    showDog()    ;    }
+function levelUp() {
+    character.level += 1;
+    character.   hp += 1; character.patk += 1; character.matk += 1;
+    character. pdef += 1; character.mdef += 1; character. spd += 1;    showDog()    ;    }
 
-</script>
-
-</body>
-</html>
+</script></body></html>
