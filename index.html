@@ -44,10 +44,10 @@ document.body.innerHTML = `
     <h1>戰鬥開始！</h1>
     
     <h2>${character.name}  Lv.${character.level}</h2>
-    <p>❤️ 生命：${character.hp}</p>
+    <p>id="characterHp">❤️ 生命：${character.hp}</p>
     <hr>
     <h2>${enemy.name}      Lv.${enemy.level}    </h2>
-    <p id="enemyHp">❤️ 生命：${enemy.hp}</p>
+    <p id="enemyHp">    ❤️ 生命：${enemy.hp}    </p>
 
     <p id="battleMessage">請選擇行動</p>
 
@@ -55,7 +55,7 @@ document.body.innerHTML = `
   <button onclick="attack(character, enemy, 'physical' )">物攻</button>
   <button onclick="attack(character, enemy, 'magic'    )">魔攻</button>
   <button onclick="defend         (                    )">防禦</button>
-  <button onclick="escape         (                    )">逃跑</button> `;    }
+  <button onclick="escape         (                    )">逃跑</button> `;   
 startTurn();}
 
 function enemyTurn() {
@@ -71,7 +71,7 @@ function startTurn() {
         = `${enemy.name}      先攻！`;    enemyTurn();}  }    
     
  function attack(attacker, defender, type) {
-    let attack;    let defense;  let message;
+    let attack;  let defense;  let message;
     if     (type === "physical" ) {
         attack = attacker.patk; defense = defender.pdef;  message = "物理";    }
     else if(type === "magic"    ) {
@@ -83,15 +83,15 @@ function startTurn() {
   document.getElementById("characterHp"  ).innerHTML =
         `❤️ 生命：${character.hp}        `;
   document.getElementById("battleMessage").innerHTML =
-        `${attacker.name} 對 ${defender.name} 造成 ${damage} 點${message}傷害！`;}
+        `${attacker.name} 對 ${defender.name} 造成 ${damage} 點${message}傷害！`;
     if (attacker === character) {
-    let enemyType = chooseEnemyAttack();attack(enemy, character, enemyType)    ;}
+    let enemyType = chooseEnemyAttack();attack(enemy, character, enemyType)    ;}}
 
  function decideFirstAttacker() {
     if      (character.spd > enemy.spd) {return character;  }
     else if (enemy.spd > character.spd) {return enemy    ;  }
     else                                {return character;  }   
-
+ }
     
 
 function calculateDamage(attack, defense) {
