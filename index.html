@@ -3,735 +3,1470 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>一格塔防</title>
+<title>御獸小舖</title>
 
 <style>
-    * {
-        box-sizing: border-box;
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    background: #171a20;
+    color: #eeeeee;
+    font-family: Arial, "Microsoft JhengHei", sans-serif;
+}
+
+button {
+    border: 0;
+    border-radius: 8px;
+    padding: 10px 14px;
+    margin: 4px;
+    font-size: 15px;
+    cursor: pointer;
+}
+
+button:hover {
+    filter: brightness(1.15);
+}
+
+.container {
+    width: min(900px, 94vw);
+    margin: auto;
+    padding-bottom: 40px;
+}
+
+h1 {
+    text-align: center;
+    margin: 20px 0 8px;
+}
+
+h2 {
+    margin-top: 8px;
+}
+
+.panel {
+    background: #242933;
+    border-radius: 12px;
+    padding: 15px;
+    margin-top: 12px;
+}
+
+.status {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 8px;
+}
+
+.status div {
+    background: #303642;
+    padding: 8px;
+    border-radius: 7px;
+    text-align: center;
+}
+
+.menu {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    margin-top: 12px;
+}
+
+.menu button {
+    background: #3c4655;
+    color: white;
+}
+
+.card {
+    background: #303642;
+    border-radius: 10px;
+    padding: 12px;
+    margin-top: 10px;
+}
+
+.grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
+}
+
+.enemy-card {
+    cursor: pointer;
+    border: 2px solid transparent;
+}
+
+.enemy-card:hover {
+    border-color: #ffffff;
+}
+
+.stat-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 6px;
+}
+
+.stat {
+    background: #1c2027;
+    padding: 7px;
+    border-radius: 6px;
+}
+
+.element {
+    display: inline-block;
+    background: #3a414d;
+    padding: 5px 8px;
+    border-radius: 6px;
+    margin: 3px;
+}
+
+.bar {
+    height: 16px;
+    background: #15181d;
+    border-radius: 10px;
+    overflow: hidden;
+    margin: 5px 0 10px;
+}
+
+.bar-fill {
+    height: 100%;
+    width: 0%;
+    background: #55b879;
+}
+
+.battle-log {
+    height: 180px;
+    overflow-y: auto;
+    background: #111419;
+    border-radius: 8px;
+    padding: 10px;
+    line-height: 1.7;
+}
+
+.item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: #303642;
+    padding: 9px;
+    margin: 5px 0;
+    border-radius: 7px;
+}
+
+.small {
+    color: #aeb6c2;
+    font-size: 14px;
+}
+
+.warning {
+    color: #ffcc66;
+}
+
+.good {
+    color: #69d98b;
+}
+
+.danger {
+    color: #ff7373;
+}
+
+.center {
+    text-align: center;
+}
+
+@media (max-width: 600px) {
+    .status {
+        grid-template-columns: repeat(2, 1fr);
     }
 
-    body {
-        margin: 0;
-        background: #20242b;
-        color: white;
-        font-family: Arial, sans-serif;
-        text-align: center;
-    }
-
-    h1 {
-        margin: 20px 0 10px;
-    }
-
-    #info {
-        display: flex;
-        justify-content: center;
-        gap: 20px;
-        margin-bottom: 15px;
-        font-size: 18px;
-    }
-
-    #game {
-        width: min(95vw, 500px);
-        margin: auto;
-    }
-
-    #map {
-        display: grid;
-        grid-template-columns: repeat(7, 1fr);
-        gap: 3px;
-        background: #111;
-        padding: 3px;
-        border-radius: 8px;
-    }
-
-    .cell {
-        aspect-ratio: 1 / 1;
-        background: #4b5963;
-        border: 1px solid #687681;
-        position: relative;
-        cursor: pointer;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-size: clamp(20px, 7vw, 36px);
-        user-select: none;
-    }
-
-    .road {
-        background: #9a805c;
-        cursor: default;
-    }
-
-    .tower {
-        background: #315b7a;
-    }
-
-    .tower.selected {
-        outline: 3px solid white;
-    }
-
-    .enemy {
-        position: absolute;
-        font-size: clamp(22px, 7vw, 34px);
-        z-index: 5;
-    }
-
-    .hp-bar {
-        position: absolute;
-        top: 3px;
-        left: 10%;
-        width: 80%;
-        height: 5px;
-        background: #333;
-        border-radius: 5px;
-        overflow: hidden;
-    }
-
-    .hp-fill {
-        height: 100%;
-        background: #55d66b;
-    }
-
-    #controls {
-        margin-top: 15px;
-        display: flex;
-        justify-content: center;
-        gap: 10px;
-        flex-wrap: wrap;
+    .grid {
+        grid-template-columns: 1fr;
     }
 
     button {
-        border: none;
-        border-radius: 8px;
-        padding: 12px 18px;
-        font-size: 16px;
-        cursor: pointer;
+        padding: 10px 11px;
     }
-
-    button:disabled {
-        opacity: 0.4;
-        cursor: not-allowed;
-    }
-
-    #message {
-        min-height: 25px;
-        margin: 12px;
-        color: #ffd86b;
-    }
-
-    #towerInfo {
-        margin-top: 10px;
-        min-height: 50px;
-        color: #ddd;
-    }
+}
 </style>
 </head>
 
 <body>
 
-<h1>🏰 一格塔防</h1>
+<div class="container">
 
-<div id="game">
+<h1>🐾 御獸小舖</h1>
 
-    <div id="info">
-        <div>❤️ <span id="life">10</span></div>
-        <div>💰 <span id="gold">100</span></div>
-        <div>🌊 第 <span id="wave">0</span> 波</div>
-    </div>
-
-    <div id="map"></div>
-
-    <div id="message">
-        點擊空地建造防禦塔
-    </div>
-
-    <div id="controls">
-        <button id="startWave">開始下一波</button>
-        <button id="upgrade" disabled>⬆️ 升級塔</button>
-    </div>
-
-    <div id="towerInfo">
-        尚未選擇防禦塔
-    </div>
+<div id="app"></div>
 
 </div>
 
 <script>
 
-/* =========================
-   基本設定
-========================= */
+/* =========================================================
+   玩家
+========================================================= */
 
-const ROWS = 5;
-const COLS = 7;
-
-let life = 10;
-let gold = 100;
-let wave = 0;
-
-let enemies = [];
-let towers = [];
-
-let waveRunning = false;
-let selectedTower = null;
-
-let enemyId = 0;
+let player = {
+    gold: 100,
+    realm: "新手森林"
+};
 
 
-/* =========================
-   道路
-========================= */
+/* =========================================================
+   核心御獸
+========================================================= */
 
-const roadPath = [
-    [2, 0],
-    [2, 1],
-    [2, 2],
-    [2, 3],
-    [2, 4],
-    [2, 5],
-    [2, 6]
+let pet = {
+    name: "寵獸",
+
+    level: 1,
+    exp: 0,
+    expMax: 100,
+
+    hp: 20,
+    maxHp: 20,
+
+    patk: 6,
+    matk: 6,
+    pdef: 6,
+    mdef: 6,
+    spd: 6,
+
+    aptitude: 1.00,
+
+    elements: {
+        fire: 0,
+        water: 0,
+        wood: 0,
+        ice: 0,
+        thunder: 0,
+        earth: 0,
+        wind: 0,
+        light: 0,
+        dark: 0
+    }
+};
+
+
+/* =========================================================
+   元素
+========================================================= */
+
+const elementData = {
+
+    fire: {
+        name: "🔥 火",
+        material: "火焰果實"
+    },
+
+    water: {
+        name: "💧 水",
+        material: "水靈花"
+    },
+
+    wood: {
+        name: "🌿 木",
+        material: "青木種子"
+    },
+
+    ice: {
+        name: "❄️ 冰",
+        material: "寒冰晶"
+    },
+
+    thunder: {
+        name: "⚡ 雷",
+        material: "雷鳴石"
+    },
+
+    earth: {
+        name: "⛰️ 土",
+        material: "大地礦石"
+    },
+
+    wind: {
+        name: "🌪️ 風",
+        material: "疾風羽"
+    },
+
+    light: {
+        name: "☀️ 光",
+        material: "光耀晶"
+    },
+
+    dark: {
+        name: "🌑 暗",
+        material: "暗影晶"
+    }
+};
+
+
+/* =========================================================
+   素材
+========================================================= */
+
+let materials = {
+    fire: 0,
+    water: 0,
+    wood: 0,
+    ice: 0,
+    thunder: 0,
+    earth: 0,
+    wind: 0,
+    light: 0,
+    dark: 0
+};
+
+
+/* =========================================================
+   野生御獸
+========================================================= */
+
+let wildPets = [];
+
+let currentEnemy = null;
+
+let battleActive = false;
+
+
+/* =========================================================
+   15種雙核心
+========================================================= */
+
+const growthCores = [
+
+    ["hp", "patk"],
+    ["hp", "matk"],
+    ["hp", "pdef"],
+    ["hp", "mdef"],
+    ["hp", "spd"],
+
+    ["patk", "matk"],
+    ["patk", "pdef"],
+    ["patk", "mdef"],
+    ["patk", "spd"],
+
+    ["matk", "pdef"],
+    ["matk", "mdef"],
+    ["matk", "spd"],
+
+    ["pdef", "mdef"],
+    ["pdef", "spd"],
+
+    ["mdef", "spd"]
+
 ];
 
 
-/* =========================
-   建立地圖
-========================= */
+/* =========================================================
+   初始化
+========================================================= */
 
-function createMap() {
+showShop();
 
-    const map = document.getElementById("map");
 
-    map.innerHTML = "";
+/* =========================================================
+   EXP
+========================================================= */
 
-    for (let row = 0; row < ROWS; row++) {
+function getExpMax(level) {
 
-        for (let col = 0; col < COLS; col++) {
+    if (level <= 10) {
+        return 100 + (level - 1) * 10;
+    }
+    else if (level <= 20) {
+        return 300 + (level - 11) * 50;
+    }
+    else if (level <= 30) {
+        return 1000 + (level - 21) * 100;
+    }
+    else {
+        return 4000 + (level - 31) * 500;
+    }
+}
 
-            const cell = document.createElement("div");
 
-            cell.classList.add("cell");
+function gainExp(amount) {
 
-            const isRoad = roadPath.some(
-                position =>
-                    position[0] === row &&
-                    position[1] === col
-            );
+    pet.exp += amount;
 
-            if (isRoad) {
-                cell.classList.add("road");
-            }
+    while (pet.exp >= pet.expMax) {
 
-            cell.dataset.row = row;
-            cell.dataset.col = col;
+        pet.exp -= pet.expMax;
 
-            cell.addEventListener("click", () => {
-                clickCell(row, col);
-            });
+        levelUp();
 
-            map.appendChild(cell);
+        pet.expMax = getExpMax(pet.level);
+    }
+}
+
+
+function levelUp() {
+
+    pet.level++;
+
+    pet.maxHp += 2;
+    pet.hp = pet.maxHp;
+
+    pet.patk++;
+    pet.matk++;
+    pet.pdef++;
+    pet.mdef++;
+    pet.spd++;
+
+}
+
+
+/* =========================================================
+   元素總量
+========================================================= */
+
+function normalizeElements() {
+
+    let total = 0;
+
+    for (let key in pet.elements) {
+        total += pet.elements[key];
+    }
+
+    if (total === 0) {
+        return;
+    }
+
+    for (let key in pet.elements) {
+        pet.elements[key] =
+            pet.elements[key] / total * 100;
+    }
+}
+
+
+/* =========================================================
+   使用素材
+========================================================= */
+
+function useMaterial(element) {
+
+    if (materials[element] <= 0) {
+        alert("沒有這個素材！");
+        return;
+    }
+
+    materials[element]--;
+
+    let oldValue = pet.elements[element];
+
+    if (oldValue === 0) {
+
+        for (let key in pet.elements) {
+            pet.elements[key] = 0;
         }
+
+        pet.elements[element] = 100;
+
     }
+    else {
+
+        for (let key in pet.elements) {
+            pet.elements[key] *= 0.90;
+        }
+
+        pet.elements[element] += 10;
+    }
+
+    normalizeElements();
+
+    showPet();
 }
 
 
-/* =========================
-   點擊格子
-========================= */
+/* =========================================================
+   進化方向
+========================================================= */
 
-function clickCell(row, col) {
+function getEvolutionType() {
 
-    const tower = towers.find(
-        tower =>
-            tower.row === row &&
-            tower.col === col
-    );
+    let list = Object.entries(pet.elements)
+        .sort((a, b) => b[1] - a[1]);
 
-    if (tower) {
-        selectTower(tower);
-        return;
+    let top1 = list[0];
+    let top2 = list[1];
+    let top3 = list[2];
+
+    if (top1[1] > 80) {
+
+        return `${elementData[top1[0]].name} 單屬性進化`;
+
     }
 
-    const isRoad = roadPath.some(
-        position =>
-            position[0] === row &&
-            position[1] === col
-    );
+    if (
+        top1[1] > 40 &&
+        top2[1] > 40 &&
+        top1[1] + top2[1] > 80
+    ) {
 
-    if (isRoad) {
-        document.getElementById("message").textContent =
-            "道路不能建造防禦塔！";
-        return;
+        return `${elementData[top1[0]].name} ＋ ${elementData[top2[0]].name} 雙屬性進化`;
+
     }
 
-    if (gold < 30) {
-        document.getElementById("message").textContent =
-            "金幣不足！";
-        return;
+    if (
+        top1[1] > 20 &&
+        top2[1] > 20 &&
+        top3[1] > 20 &&
+        top1[1] + top2[1] + top3[1] > 80
+    ) {
+
+        return `${elementData[top1[0]].name} ＋ ${elementData[top2[0]].name} ＋ ${elementData[top3[0]].name} 三屬性進化`;
+
     }
 
-    buildTower(row, col);
+    return "目前尚未形成明確進化方向";
 }
 
 
-/* =========================
-   建造塔
-========================= */
+/* =========================================================
+   生成敵人等級
+========================================================= */
 
-function buildTower(row, col) {
+function getEnemyLevel() {
 
-    gold -= 30;
+    let difference =
+        Math.floor(Math.random() * 5) - 2;
 
-    const tower = {
-        row: row,
-        col: col,
+    let level =
+        pet.level + difference;
 
-        level: 1,
+    if (level < 1) {
+        level = 1;
+    }
 
-        damage: 4,
+    return level;
+}
 
-        range: 2.2,
 
-        attackSpeed: 800,
+/* =========================================================
+   生成野生御獸
+========================================================= */
 
-        lastAttack: 0
+function createWildPet() {
+
+    let level = getEnemyLevel();
+
+    let core =
+        growthCores[
+            Math.floor(Math.random() * growthCores.length)
+        ];
+
+    let enemy = {
+
+        name: randomPetName(),
+
+        level: level,
+
+        hp: 10 + level * 3,
+        patk: 5 + level,
+        matk: 5 + level,
+        pdef: 5 + level,
+        mdef: 5 + level,
+        spd: 5 + level,
+
+        growthCore: core,
+
+        maxHp: 10 + level * 3
     };
 
-    towers.push(tower);
-
-    document.getElementById("message").textContent =
-        "🏹 建造了一座弓箭塔！";
-
-    updateUI();
-    drawMap();
-}
-
-
-/* =========================
-   選擇塔
-========================= */
-
-function selectTower(tower) {
-
-    selectedTower = tower;
-
-    document.getElementById("upgrade").disabled = false;
-
-    document.getElementById("towerInfo").textContent =
-        `🏹 弓箭塔 Lv.${tower.level}　傷害 ${tower.damage}　範圍 ${tower.range}`;
-
-    document.getElementById("message").textContent =
-        "已選擇防禦塔";
-
-    drawMap();
-}
-
-
-/* =========================
-   升級塔
-========================= */
-
-function upgradeTower() {
-
-    if (!selectedTower) {
-        return;
-    }
-
-    const cost = selectedTower.level * 40;
-
-    if (gold < cost) {
-
-        document.getElementById("message").textContent =
-            `升級需要 ${cost} 金幣！`;
-
-        return;
-    }
-
-    gold -= cost;
-
-    selectedTower.level += 1;
-    selectedTower.damage += 3;
-    selectedTower.range += 0.3;
-
-    document.getElementById("message").textContent =
-        "⬆️ 防禦塔升級成功！";
-
-    document.getElementById("towerInfo").textContent =
-        `🏹 弓箭塔 Lv.${selectedTower.level}　傷害 ${selectedTower.damage}　範圍 ${selectedTower.range.toFixed(1)}`;
-
-    updateUI();
-    drawMap();
-}
-
-
-/* =========================
-   開始波次
-========================= */
-
-function startWave() {
-
-    if (waveRunning) {
-        return;
-    }
-
-    wave++;
-
-    waveRunning = true;
-
-    enemies = [];
-
-    document.getElementById("message").textContent =
-        `🌊 第 ${wave} 波開始！`;
-
-    let enemyCount = 5 + wave * 2;
-
-    for (let i = 0; i < enemyCount; i++) {
-
-        setTimeout(() => {
-
-            spawnEnemy();
-
-        }, i * 900);
-    }
-
-    setTimeout(() => {
-
-        waveRunning = false;
-
-    }, enemyCount * 900 + 1000);
-
-    updateUI();
-}
-
-
-/* =========================
-   生成敵人
-========================= */
-
-function spawnEnemy() {
-
-    const enemy = {
-
-        id: enemyId++,
-
-        pathIndex: 0,
-
-        hp: 10 + wave * 3,
-
-        maxHp: 10 + wave * 3,
-
-        speed: 0.0015 + wave * 0.0001,
-
-        progress: 0
-    };
-
-    enemies.push(enemy);
-}
-
-
-/* =========================
-   遊戲主循環
-========================= */
-
-function gameLoop(timestamp) {
-
-    updateEnemies();
-
-    updateTowers(timestamp);
-
-    drawMap();
-
-    requestAnimationFrame(gameLoop);
-}
-
-
-/* =========================
-   敵人移動
-========================= */
-
-function updateEnemies() {
-
-    for (let i = enemies.length - 1; i >= 0; i--) {
-
-        const enemy = enemies[i];
-
-        enemy.progress += enemy.speed;
-
-        if (enemy.progress >= 1) {
-
-            enemy.progress = 0;
-
-            enemy.pathIndex++;
-
-            if (enemy.pathIndex >= roadPath.length) {
-
-                life--;
-
-                enemies.splice(i, 1);
-
-                document.getElementById("message").textContent =
-                    "👾 有敵人突破防線！";
-
-                if (life <= 0) {
-
-                    gameOver();
-
-                    return;
-                }
-            }
-        }
-    }
-
-    updateUI();
-}
-
-
-/* =========================
-   防禦塔攻擊
-========================= */
-
-function updateTowers(timestamp) {
-
-    for (const tower of towers) {
-
-        if (timestamp - tower.lastAttack < tower.attackSpeed) {
-            continue;
+    let elements = [
+        "fire",
+        "water",
+        "wood",
+        "ice",
+        "thunder",
+        "earth",
+        "wind",
+        "light",
+        "dark"
+    ];
+
+    enemy.element =
+        elements[
+            Math.floor(Math.random() * elements.length)
+        ];
+
+    for (let stat of core) {
+
+        if (stat === "hp") {
+            enemy.hp += level * 2;
+            enemy.maxHp = enemy.hp;
         }
 
-        const target = findTarget(tower);
-
-        if (!target) {
-            continue;
-        }
-
-        target.hp -= tower.damage;
-
-        tower.lastAttack = timestamp;
-
-        if (target.hp <= 0) {
-
-            const index = enemies.indexOf(target);
-
-            if (index !== -1) {
-
-                enemies.splice(index, 1);
-
-                gold += 10;
-
-                document.getElementById("message").textContent =
-                    "💰 擊敗敵人，獲得 10 金幣！";
-            }
-        }
+        if (stat === "patk") enemy.patk += level;
+        if (stat === "matk") enemy.matk += level;
+        if (stat === "pdef") enemy.pdef += level;
+        if (stat === "mdef") enemy.mdef += level;
+        if (stat === "spd") enemy.spd += level;
     }
 
-    updateUI();
+    return enemy;
 }
 
 
-/* =========================
-   尋找攻擊目標
-========================= */
+function randomPetName() {
 
-function findTarget(tower) {
+    let names = [
+        "赤焰狼",
+        "水靈狐",
+        "青木鹿",
+        "寒冰犬",
+        "雷牙獸",
+        "岩甲熊",
+        "疾風貓",
+        "月光兔",
+        "暗影狐"
+    ];
 
-    let target = null;
-
-    let bestProgress = -1;
-
-    for (const enemy of enemies) {
-
-        const position = getEnemyPosition(enemy);
-
-        const towerX = tower.col;
-        const towerY = tower.row;
-
-        const distance = Math.sqrt(
-            Math.pow(position.x - towerX, 2) +
-            Math.pow(position.y - towerY, 2)
-        );
-
-        if (distance <= tower.range) {
-
-            if (enemy.pathIndex > bestProgress) {
-
-                bestProgress = enemy.pathIndex;
-
-                target = enemy;
-            }
-        }
-    }
-
-    return target;
+    return names[
+        Math.floor(Math.random() * names.length)
+    ];
 }
 
 
-/* =========================
-   敵人位置
-========================= */
+/* =========================================================
+   探索
+========================================================= */
 
-function getEnemyPosition(enemy) {
+function explore() {
 
-    const current = roadPath[enemy.pathIndex];
+    wildPets = [];
 
-    const next = roadPath[enemy.pathIndex + 1];
+    let count = 3;
 
-    if (!next) {
+    for (let i = 0; i < count; i++) {
+        wildPets.push(createWildPet());
+    }
+
+    showExplore();
+}
+
+
+/* =========================================================
+   開始戰鬥
+========================================================= */
+
+function startBattle(index) {
+
+    currentEnemy = wildPets[index];
+
+    battleActive = true;
+
+    pet.hp = pet.maxHp;
+
+    showBattle();
+}
+
+
+/* =========================================================
+   傷害計算
+========================================================= */
+
+function calculateDamage(attacker, defender, type) {
+
+    let attack;
+    let defense;
+
+    if (type === "physical") {
+
+        attack = attacker.patk;
+        defense = defender.pdef;
+
+    }
+    else if (type === "magic") {
+
+        attack = attacker.matk;
+        defense = defender.mdef;
+
+    }
+    else {
 
         return {
-            x: current[1],
-            y: current[0]
+            damage: 0,
+            reflected: false
         };
+    }
+
+
+    let difference = attack - defense;
+
+
+    if (difference > 0) {
+
+        return {
+            damage: difference,
+            reflected: false
+        };
+
+    }
+
+    if (difference === 0) {
+
+        return {
+            damage: 0,
+            reflected: false
+        };
+
     }
 
     return {
 
-        x: current[1] +
-            (next[1] - current[1]) * enemy.progress,
+        damage: 0,
 
-        y: current[0] +
-            (next[0] - current[0]) * enemy.progress
+        reflected: true,
+
+        reflection: attack
     };
 }
 
 
-/* =========================
-   畫面
-========================= */
+/* =========================================================
+   玩家攻擊
+========================================================= */
 
-function drawMap() {
+function playerAttack(type) {
 
-    const cells = document.querySelectorAll(".cell");
+    if (!battleActive) {
+        return;
+    }
 
-    cells.forEach(cell => {
+    let result =
+        calculateDamage(pet, currentEnemy, type);
 
-        cell.innerHTML = "";
+    currentEnemy.hp -= result.damage;
 
-        cell.classList.remove("tower");
-        cell.classList.remove("selected");
+    let message =
+        `${pet.name} 使用${type === "physical" ? "物攻" : "魔攻"}，造成 ${result.damage} 點傷害。`;
 
-        const row = Number(cell.dataset.row);
-        const col = Number(cell.dataset.col);
 
-        const tower = towers.find(
-            tower =>
-                tower.row === row &&
-                tower.col === col
+    if (result.reflected) {
+
+        pet.hp -= result.reflection;
+
+        message +=
+            ` 防禦反彈！寵獸受到 ${result.reflection} 點反傷。`;
+    }
+
+
+    addBattleLog(message);
+
+
+    if (currentEnemy.hp <= 0) {
+
+        victory();
+
+        return;
+    }
+
+
+    if (pet.hp <= 0) {
+
+        defeat();
+
+        return;
+    }
+
+
+    enemyTurn();
+}
+
+
+/* =========================================================
+   敵人攻擊
+========================================================= */
+
+function enemyTurn() {
+
+    let physical =
+        calculateDamage(
+            currentEnemy,
+            pet,
+            "physical"
         );
 
-        if (tower) {
-
-            cell.classList.add("tower");
-
-            cell.textContent = "🏹";
-
-            if (tower === selectedTower) {
-                cell.classList.add("selected");
-            }
-        }
-    });
-
-
-    for (const enemy of enemies) {
-
-        const position = getEnemyPosition(enemy);
-
-        const row = Math.round(position.y);
-        const col = Math.round(position.x);
-
-        const cell = document.querySelector(
-            `.cell[data-row="${row}"][data-col="${col}"]`
+    let magic =
+        calculateDamage(
+            currentEnemy,
+            pet,
+            "magic"
         );
 
-        if (!cell) {
-            continue;
-        }
+    let type;
 
-        const enemyElement = document.createElement("div");
+    if (physical.damage >= magic.damage) {
+        type = "physical";
+    }
+    else {
+        type = "magic";
+    }
 
-        enemyElement.classList.add("enemy");
+    let result =
+        calculateDamage(
+            currentEnemy,
+            pet,
+            type
+        );
 
-        enemyElement.textContent = "👾";
+    pet.hp -= result.damage;
 
-        const hpBar = document.createElement("div");
+    let message =
+        `${currentEnemy.name} 使用${type === "physical" ? "物攻" : "魔攻"}，造成 ${result.damage} 點傷害。`;
 
-        hpBar.classList.add("hp-bar");
+    if (result.reflected) {
 
-        const hpFill = document.createElement("div");
+        currentEnemy.hp -= result.reflection;
 
-        hpFill.classList.add("hp-fill");
+        message +=
+            ` 防禦反彈！${currentEnemy.name} 受到 ${result.reflection} 點反傷。`;
+    }
 
-        hpFill.style.width =
-            `${Math.max(0, enemy.hp / enemy.maxHp * 100)}%`;
+    addBattleLog(message);
 
-        hpBar.appendChild(hpFill);
 
-        cell.appendChild(enemyElement);
+    if (pet.hp <= 0) {
 
-        cell.appendChild(hpBar);
+        defeat();
+
+        return;
+    }
+
+    showBattle();
+}
+
+
+/* =========================================================
+   防禦
+========================================================= */
+
+function defend() {
+
+    addBattleLog(
+        `${pet.name} 進入防禦狀態。`
+    );
+
+    enemyTurn();
+}
+
+
+/* =========================================================
+   速度判定
+========================================================= */
+
+function firstTurn() {
+
+    if (pet.spd >= currentEnemy.spd) {
+        return "player";
+    }
+
+    return "enemy";
+}
+
+
+/* =========================================================
+   勝利
+========================================================= */
+
+function victory() {
+
+    battleActive = false;
+
+    let exp = 20 + currentEnemy.level * 10;
+
+    gainExp(exp);
+
+    player.gold += 20;
+
+    materials[currentEnemy.element]++;
+
+    addBattleLog(
+        `🎉 戰鬥勝利！獲得 ${exp} EXP、20 金幣、1 個${elementData[currentEnemy.element].material}。`
+    );
+
+    showBattleResult("勝利");
+}
+
+
+/* =========================================================
+   失敗
+========================================================= */
+
+function defeat() {
+
+    battleActive = false;
+
+    pet.hp = 0;
+
+    showBattleResult("敗北");
+}
+
+
+/* =========================================================
+   戰鬥紀錄
+========================================================= */
+
+let logs = [];
+
+function addBattleLog(text) {
+
+    logs.push(text);
+
+    if (logs.length > 20) {
+        logs.shift();
     }
 }
 
 
-/* =========================
-   UI
-========================= */
+/* =========================================================
+   商店畫面
+========================================================= */
 
-function updateUI() {
+function showShop() {
 
-    document.getElementById("life").textContent = life;
+    document.getElementById("app").innerHTML = `
 
-    document.getElementById("gold").textContent = gold;
+        <div class="panel">
 
-    document.getElementById("wave").textContent = wave;
+            <h2>🏪 御獸小舖</h2>
+
+            <p>
+                金幣：💰 ${player.gold}
+            </p>
+
+            <div class="menu">
+
+                <button onclick="showPet()">
+                    🐶 查看寵獸
+                </button>
+
+                <button onclick="explore()">
+                    🗺️ 秘境探索
+                </button>
+
+                <button onclick="showMaterials()">
+                    🎒 素材庫
+                </button>
+
+            </div>
+
+        </div>
+
+        <div class="panel">
+
+            <h2>今日公告</h2>
+
+            <p>
+                歡迎來到御獸小舖。
+            </p>
+
+            <p class="small">
+                去秘境尋找素材，培養你的核心御獸。
+            </p>
+
+        </div>
+    `;
 }
 
 
-/* =========================
-   Game Over
-========================= */
+/* =========================================================
+   寵獸畫面
+========================================================= */
 
-function gameOver() {
+function showPet() {
 
-    waveRunning = false;
+    let elementHTML = "";
 
-    enemies = [];
+    for (let key in pet.elements) {
 
-    document.getElementById("message").textContent =
-        "💀 防線失守！";
+        if (pet.elements[key] > 0.01) {
 
-    setTimeout(() => {
-
-        const restart = confirm(
-            "遊戲結束！\n\n要重新開始嗎？"
-        );
-
-        if (restart) {
-            location.reload();
+            elementHTML += `
+                <span class="element">
+                    ${elementData[key].name}
+                    ${pet.elements[key].toFixed(1)}%
+                </span>
+            `;
         }
+    }
 
-    }, 100);
+
+    let expPercent =
+        pet.exp / pet.expMax * 100;
+
+
+    let materialButtons = "";
+
+    for (let key in materials) {
+
+        materialButtons += `
+
+            <div class="item">
+
+                <span>
+                    ${elementData[key].name}
+                    ${elementData[key].material}
+                    ×${materials[key]}
+                </span>
+
+                <button
+                    onclick="useMaterial('${key}')"
+                    ${materials[key] <= 0 ? "disabled" : ""}
+                >
+                    使用
+                </button>
+
+            </div>
+        `;
+    }
+
+
+    document.getElementById("app").innerHTML = `
+
+        <div class="panel">
+
+            <button onclick="showShop()">← 返回小舖</button>
+
+            <h2>🐶 ${pet.name}</h2>
+
+            <p>
+                Lv.${pet.level}
+               　
+                EXP ${pet.exp} / ${pet.expMax}
+            </p>
+
+            <div class="bar">
+                <div
+                    class="bar-fill"
+                    style="width:${expPercent}%"
+                ></div>
+            </div>
+
+        </div>
+
+
+        <div class="panel">
+
+            <h2>📊 六圍</h2>
+
+            <div class="stat-grid">
+
+                <div class="stat">❤️ 生命：${pet.hp} / ${pet.maxHp}</div>
+                <div class="stat">⚔️ 物理攻擊：${pet.patk}</div>
+
+                <div class="stat">🔮 魔法攻擊：${pet.matk}</div>
+                <div class="stat">🛡️ 物理防禦：${pet.pdef}</div>
+
+                <div class="stat">🧿 魔法防禦：${pet.mdef}</div>
+                <div class="stat">💨 速度：${pet.spd}</div>
+
+            </div>
+
+        </div>
+
+
+        <div class="panel">
+
+            <h2>🧬 資質</h2>
+
+            <p>
+                固定資質：${pet.aptitude.toFixed(2)}
+            </p>
+
+            <p class="small">
+                資質決定成長效率，正常培育無法改變。
+            </p>
+
+        </div>
+
+
+        <div class="panel">
+
+            <h2>🌟 元素傾向</h2>
+
+            ${elementHTML}
+
+            <hr>
+
+            <p>
+                <strong>
+                    目前進化方向：
+                </strong>
+            </p>
+
+            <p class="warning">
+                ${getEvolutionType()}
+            </p>
+
+        </div>
+
+
+        <div class="panel">
+
+            <h2>🧪 使用素材</h2>
+
+            ${materialButtons}
+
+        </div>
+    `;
 }
 
 
-/* =========================
-   按鈕
-========================= */
+/* =========================================================
+   素材庫
+========================================================= */
 
-document.getElementById("startWave")
-    .addEventListener("click", startWave);
+function showMaterials() {
 
-document.getElementById("upgrade")
-    .addEventListener("click", upgradeTower);
+    let html = "";
+
+    for (let key in materials) {
+
+        html += `
+
+            <div class="item">
+
+                <span>
+                    ${elementData[key].name}
+                    ${elementData[key].material}
+                </span>
+
+                <strong>
+                    ×${materials[key]}
+                </strong>
+
+            </div>
+        `;
+    }
 
 
-/* =========================
-   啟動遊戲
-========================= */
+    document.getElementById("app").innerHTML = `
 
-createMap();
+        <div class="panel">
 
-updateUI();
+            <button onclick="showShop()">
+                ← 返回小舖
+            </button>
 
-requestAnimationFrame(gameLoop);
+            <h2>🎒 素材庫</h2>
+
+            ${html}
+
+        </div>
+    `;
+}
+
+
+/* =========================================================
+   探索畫面
+========================================================= */
+
+function showExplore() {
+
+    let cards = "";
+
+    wildPets.forEach((enemy, index) => {
+
+        let coreNames =
+            enemy.growthCore
+                .map(statName)
+                .join(" ＋ ");
+
+
+        cards += `
+
+            <div
+                class="card enemy-card"
+                onclick="startBattle(${index})"
+            >
+
+                <h3>
+                    ${enemy.name}
+                </h3>
+
+                <p>
+                    Lv.${enemy.level}
+                </p>
+
+                <p>
+                    ${elementData[enemy.element].name}
+                </p>
+
+                <div class="stat-grid">
+
+                    <div class="stat">
+                        ❤️ ${enemy.hp}
+                    </div>
+
+                    <div class="stat">
+                        ⚔️ ${enemy.patk}
+                    </div>
+
+                    <div class="stat">
+                        🔮 ${enemy.matk}
+                    </div>
+
+                    <div class="stat">
+                        🛡️ ${enemy.pdef}
+                    </div>
+
+                    <div class="stat">
+                        🧿 ${enemy.mdef}
+                    </div>
+
+                    <div class="stat">
+                        💨 ${enemy.spd}
+                    </div>
+
+                </div>
+
+                <p class="small">
+                    成長核心：${coreNames}
+                </p>
+
+                <button>
+                    選擇
+                </button>
+
+            </div>
+        `;
+    });
+
+
+    document.getElementById("app").innerHTML = `
+
+        <div class="panel">
+
+            <button onclick="showShop()">
+                ← 返回小舖
+            </button>
+
+            <h2>🗺️ 新手森林</h2>
+
+            <p class="small">
+                發現了 ${wildPets.length} 隻野生御獸。
+                選擇一隻開始戰鬥。
+            </p>
+
+        </div>
+
+        <div class="grid">
+            ${cards}
+        </div>
+
+        <div class="center">
+
+            <button onclick="explore()">
+                🔄 重新探索
+            </button>
+
+        </div>
+    `;
+}
+
+
+/* =========================================================
+   六圍名稱
+========================================================= */
+
+function statName(stat) {
+
+    const names = {
+
+        hp: "生命",
+
+        patk: "物理攻擊",
+
+        matk: "魔法攻擊",
+
+        pdef: "物理防禦",
+
+        mdef: "魔法防禦",
+
+        spd: "速度"
+
+    };
+
+    return names[stat];
+}
+
+
+/* =========================================================
+   戰鬥畫面
+========================================================= */
+
+function showBattle() {
+
+    let playerFirst =
+        firstTurn() === "player";
+
+
+    document.getElementById("app").innerHTML = `
+
+        <div class="panel">
+
+            <h2>⚔️ 戰鬥</h2>
+
+            <div class="grid">
+
+                <div class="card">
+
+                    <h3>
+                        🐶 ${pet.name}
+                    </h3>
+
+                    <p>
+                        Lv.${pet.level}
+                    </p>
+
+                    <p>
+                        ❤️ ${Math.max(0, pet.hp)}
+                        / ${pet.maxHp}
+                    </p>
+
+                    <p>
+                        💨 速度：${pet.spd}
+                    </p>
+
+                </div>
+
+
+                <div class="card">
+
+                    <h3>
+                        👾 ${currentEnemy.name}
+                    </h3>
+
+                    <p>
+                        Lv.${currentEnemy.level}
+                    </p>
+
+                    <p>
+                        ❤️ ${Math.max(0, currentEnemy.hp)}
+                        / ${currentEnemy.maxHp}
+                    </p>
+
+                    <p>
+                        💨 速度：${currentEnemy.spd}
+                    </p>
+
+                </div>
+
+            </div>
+
+            <p class="${playerFirst ? "good" : "warning"}">
+
+                ${playerFirst
+                    ? "⚡ 你的速度較快，你先行動。"
+                    : "⚡ 敵人的速度較快，敵人先行動。"}
+
+            </p>
+
+        </div>
+
+
+        <div class="panel">
+
+            <h3>🎮 行動</h3>
+
+            <button onclick="playerAttack('physical')">
+                ⚔️ 物攻
+            </button>
+
+            <button onclick="playerAttack('magic')">
+                🔮 魔攻
+            </button>
+
+            <button onclick="defend()">
+                🛡️ 防禦
+            </button>
+
+        </div>
+
+
+        <div class="panel">
+
+            <h3>📜 戰鬥紀錄</h3>
+
+            <div class="battle-log">
+
+                ${logs.join("<br>")}
+
+            </div>
+
+        </div>
+    `;
+}
+
+
+/* =========================================================
+   戰鬥結果
+========================================================= */
+
+function showBattleResult(result) {
+
+    document.getElementById("app").innerHTML = `
+
+        <div class="panel center">
+
+            <h1>
+                ${result === "勝利" ? "🎉 戰鬥勝利！" : "💀 戰鬥失敗"}
+            </h1>
+
+            ${
+                result === "勝利"
+                ?
+                `
+                <p>
+                    獲得 EXP、金幣與元素素材。
+                </p>
+
+                <button onclick="explore()">
+                    🗺️ 繼續探索
+                </button>
+                `
+                :
+                `
+                <p>
+                    寵獸倒下了。
+                </p>
+
+                <button onclick="restartGame()">
+                    🔄 重新開始
+                </button>
+                `
+            }
+
+            <button onclick="showShop()">
+                🏪 回到小舖
+            </button>
+
+        </div>
+
+        <div class="panel">
+
+            <h3>📜 戰鬥紀錄</h3>
+
+            <div class="battle-log">
+                ${logs.join("<br>")}
+            </div>
+
+        </div>
+    `;
+}
+
+
+/* =========================================================
+   重新開始
+========================================================= */
+
+function restartGame() {
+
+    location.reload();
+
+}
 
 </script>
 
