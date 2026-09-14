@@ -1,4 +1,4 @@
-<!DOCTYPE html> 
+<!DOCTYPE html>
 <html lang="zh-Hant">
 <head>
 <meta charset="UTF-8">
@@ -6,6 +6,7 @@
 <title>御獸小舖</title>
 
 <style>
+
 * {
     box-sizing: border-box;
 }
@@ -28,6 +29,11 @@ button {
 
 button:hover {
     filter: brightness(1.15);
+}
+
+button:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
 }
 
 .container {
@@ -129,17 +135,7 @@ h2 {
 
 .bar-fill {
     height: 100%;
-    width: 0%;
     background: #55b879;
-}
-
-.battle-log {
-    height: 180px;
-    overflow-y: auto;
-    background: #111419;
-    border-radius: 8px;
-    padding: 10px;
-    line-height: 1.7;
 }
 
 .item {
@@ -150,6 +146,15 @@ h2 {
     padding: 9px;
     margin: 5px 0;
     border-radius: 7px;
+}
+
+.battle-log {
+    height: 200px;
+    overflow-y: auto;
+    background: #111419;
+    border-radius: 8px;
+    padding: 10px;
+    line-height: 1.7;
 }
 
 .small {
@@ -173,7 +178,26 @@ h2 {
     text-align: center;
 }
 
+.realm-button {
+    width: 100%;
+    text-align: left;
+    background: #303642;
+    color: white;
+    padding: 14px;
+}
+
+.realm-button strong {
+    font-size: 17px;
+}
+
+.realm-button span {
+    display: block;
+    margin-top: 4px;
+    color: #aeb6c2;
+}
+
 @media (max-width: 600px) {
+
     .status {
         grid-template-columns: repeat(2, 1fr);
     }
@@ -186,6 +210,7 @@ h2 {
         padding: 10px 11px;
     }
 }
+
 </style>
 </head>
 
@@ -201,13 +226,15 @@ h2 {
 
 <script>
 
+
 /* =========================================================
    玩家
 ========================================================= */
 
 let player = {
-    gold: 100,
-    realm: "新手森林"
+
+    gold: 100
+
 };
 
 
@@ -216,87 +243,116 @@ let player = {
 ========================================================= */
 
 let pet = {
+
     name: "寵獸",
 
     level: 1,
+
     exp: 0,
+
     expMax: 100,
 
     hp: 20,
+
     maxHp: 20,
 
-    patk: 6,
-    matk: 6,
-    pdef: 6,
-    mdef: 6,
-    spd: 6,
+    patk: 8,
+
+    matk: 8,
+
+    pdef: 8,
+
+    mdef: 8,
+
+    spd: 8,
 
     aptitude: 1.00,
 
     elements: {
+
         fire: 0,
+
         water: 0,
+
         wood: 0,
+
         ice: 0,
+
         thunder: 0,
+
         earth: 0,
+
         wind: 0,
+
         light: 0,
+
         dark: 0
+
     }
+
 };
 
 
 /* =========================================================
-   元素
+   九大元素
 ========================================================= */
 
 const elementData = {
 
     fire: {
         name: "🔥 火",
+        realm: "🔥 火焰秘境",
         material: "火焰果實"
     },
 
     water: {
         name: "💧 水",
+        realm: "💧 水靈秘境",
         material: "水靈花"
     },
 
     wood: {
         name: "🌿 木",
+        realm: "🌿 青木秘境",
         material: "青木種子"
     },
 
     ice: {
         name: "❄️ 冰",
+        realm: "❄️ 寒冰秘境",
         material: "寒冰晶"
     },
 
     thunder: {
         name: "⚡ 雷",
+        realm: "⚡ 雷鳴秘境",
         material: "雷鳴石"
     },
 
     earth: {
         name: "⛰️ 土",
+        realm: "⛰️ 大地秘境",
         material: "大地礦石"
     },
 
     wind: {
         name: "🌪️ 風",
+        realm: "🌪️ 疾風秘境",
         material: "疾風羽"
     },
 
     light: {
         name: "☀️ 光",
+        realm: "☀️ 聖光秘境",
         material: "光耀晶"
     },
 
     dark: {
         name: "🌑 暗",
+        realm: "🌑 暗影秘境",
         material: "暗影晶"
     }
+
 };
 
 
@@ -305,27 +361,26 @@ const elementData = {
 ========================================================= */
 
 let materials = {
+
     fire: 0,
+
     water: 0,
+
     wood: 0,
+
     ice: 0,
+
     thunder: 0,
+
     earth: 0,
+
     wind: 0,
+
     light: 0,
+
     dark: 0
+
 };
-
-
-/* =========================================================
-   野生御獸
-========================================================= */
-
-let wildPets = [];
-
-let currentEnemy = null;
-
-let battleActive = false;
 
 
 /* =========================================================
@@ -358,570 +413,52 @@ const growthCores = [
 
 
 /* =========================================================
-   初始化
+   九大秘境
+========================================================= */
+
+const realms = [
+
+    "fire",
+    "water",
+    "wood",
+    "ice",
+    "thunder",
+    "earth",
+    "wind",
+    "light",
+    "dark"
+
+];
+
+
+/* =========================================================
+   目前秘境
+========================================================= */
+
+let currentRealm = null;
+
+let wildPets = [];
+
+let currentEnemy = null;
+
+let currentEnemyIndex = -1;
+
+let battleActive = false;
+
+let enemyTurnTimer = null;
+
+let logs = [];
+
+
+/* =========================================================
+   小舖
 ========================================================= */
 
 showShop();
 
 
 /* =========================================================
-   EXP
-========================================================= */
-
-function getExpMax(level) {
-
-    if (level <= 10) {
-        return 100 + (level - 1) * 10;
-    }
-    else if (level <= 20) {
-        return 300 + (level - 11) * 50;
-    }
-    else if (level <= 30) {
-        return 1000 + (level - 21) * 100;
-    }
-    else {
-        return 4000 + (level - 31) * 500;
-    }
-}
-
-
-function gainExp(amount) {
-
-    pet.exp += amount;
-
-    while (pet.exp >= pet.expMax) {
-
-        pet.exp -= pet.expMax;
-
-        levelUp();
-
-        pet.expMax = getExpMax(pet.level);
-    }
-}
-
-
-function levelUp() {
-
-    pet.level++;
-
-    pet.maxHp += 2;
-    pet.hp = pet.maxHp;
-
-    pet.patk++;
-    pet.matk++;
-    pet.pdef++;
-    pet.mdef++;
-    pet.spd++;
-
-}
-
-
-/* =========================================================
-   元素總量
-========================================================= */
-
-function normalizeElements() {
-
-    let total = 0;
-
-    for (let key in pet.elements) {
-        total += pet.elements[key];
-    }
-
-    if (total === 0) {
-        return;
-    }
-
-    for (let key in pet.elements) {
-        pet.elements[key] =
-            pet.elements[key] / total * 100;
-    }
-}
-
-
-/* =========================================================
-   使用素材
-========================================================= */
-
-function useMaterial(element) {
-
-    if (materials[element] <= 0) {
-        alert("沒有這個素材！");
-        return;
-    }
-
-    materials[element]--;
-
-    let oldValue = pet.elements[element];
-
-    if (oldValue === 0) {
-
-        for (let key in pet.elements) {
-            pet.elements[key] = 0;
-        }
-
-        pet.elements[element] = 100;
-
-    }
-    else {
-
-        for (let key in pet.elements) {
-            pet.elements[key] *= 0.90;
-        }
-
-        pet.elements[element] += 10;
-    }
-
-    normalizeElements();
-
-    showPet();
-}
-
-
-/* =========================================================
-   進化方向
-========================================================= */
-
-function getEvolutionType() {
-
-    let list = Object.entries(pet.elements)
-        .sort((a, b) => b[1] - a[1]);
-
-    let top1 = list[0];
-    let top2 = list[1];
-    let top3 = list[2];
-
-    if (top1[1] > 80) {
-
-        return `${elementData[top1[0]].name} 單屬性進化`;
-
-    }
-
-    if (
-        top1[1] > 40 &&
-        top2[1] > 40 &&
-        top1[1] + top2[1] > 80
-    ) {
-
-        return `${elementData[top1[0]].name} ＋ ${elementData[top2[0]].name} 雙屬性進化`;
-
-    }
-
-    if (
-        top1[1] > 20 &&
-        top2[1] > 20 &&
-        top3[1] > 20 &&
-        top1[1] + top2[1] + top3[1] > 80
-    ) {
-
-        return `${elementData[top1[0]].name} ＋ ${elementData[top2[0]].name} ＋ ${elementData[top3[0]].name} 三屬性進化`;
-
-    }
-
-    return "目前尚未形成明確進化方向";
-}
-
-
-/* =========================================================
-   生成敵人等級
-========================================================= */
-
-function getEnemyLevel() {
-
-    let difference =
-        Math.floor(Math.random() * 5) - 2;
-
-    let level =
-        pet.level + difference;
-
-    if (level < 1) {
-        level = 1;
-    }
-
-    return level;
-}
-
-
-/* =========================================================
-   生成野生御獸
-========================================================= */
-
-function createWildPet() {
-
-    let level = getEnemyLevel();
-
-    let core =
-        growthCores[
-            Math.floor(Math.random() * growthCores.length)
-        ];
-
-    let enemy = {
-
-        name: randomPetName(),
-
-        level: level,
-
-        hp: 10 + level * 3,
-        patk: 5 + level,
-        matk: 5 + level,
-        pdef: 5 + level,
-        mdef: 5 + level,
-        spd: 5 + level,
-
-        growthCore: core,
-
-        maxHp: 10 + level * 3
-    };
-
-    let elements = [
-        "fire",
-        "water",
-        "wood",
-        "ice",
-        "thunder",
-        "earth",
-        "wind",
-        "light",
-        "dark"
-    ];
-
-    enemy.element =
-        elements[
-            Math.floor(Math.random() * elements.length)
-        ];
-
-    for (let stat of core) {
-
-        if (stat === "hp") {
-            enemy.hp += level * 2;
-            enemy.maxHp = enemy.hp;
-        }
-
-        if (stat === "patk") enemy.patk += level;
-        if (stat === "matk") enemy.matk += level;
-        if (stat === "pdef") enemy.pdef += level;
-        if (stat === "mdef") enemy.mdef += level;
-        if (stat === "spd") enemy.spd += level;
-    }
-
-    return enemy;
-}
-
-
-function randomPetName() {
-
-    let names = [
-        "赤焰狼",
-        "水靈狐",
-        "青木鹿",
-        "寒冰犬",
-        "雷牙獸",
-        "岩甲熊",
-        "疾風貓",
-        "月光兔",
-        "暗影狐"
-    ];
-
-    return names[
-        Math.floor(Math.random() * names.length)
-    ];
-}
-
-
-/* =========================================================
-   探索
-========================================================= */
-
-function explore() {
-
-    wildPets = [];
-
-    let count = 3;
-
-    for (let i = 0; i < count; i++) {
-        wildPets.push(createWildPet());
-    }
-
-    showExplore();
-}
-
-
-/* =========================================================
-   開始戰鬥
-========================================================= */
-
-function startBattle(index) {
-
-    currentEnemy = wildPets[index];
-
-    battleActive = true;
-
-    pet.hp = pet.maxHp;
-
-    showBattle();
-}
-
-
-/* =========================================================
-   傷害計算
-========================================================= */
-
-function calculateDamage(attacker, defender, type) {
-
-    let attack;
-    let defense;
-
-    if (type === "physical") {
-
-        attack = attacker.patk;
-        defense = defender.pdef;
-
-    }
-    else if (type === "magic") {
-
-        attack = attacker.matk;
-        defense = defender.mdef;
-
-    }
-    else {
-
-        return {
-            damage: 0,
-            reflected: false
-        };
-    }
-
-
-    let difference = attack - defense;
-
-
-    if (difference > 0) {
-
-        return {
-            damage: difference,
-            reflected: false
-        };
-
-    }
-
-    if (difference === 0) {
-
-        return {
-            damage: 0,
-            reflected: false
-        };
-
-    }
-
-    return {
-
-        damage: 0,
-
-        reflected: true,
-
-        reflection: attack
-    };
-}
-
-
-/* =========================================================
-   玩家攻擊
-========================================================= */
-
-function playerAttack(type) {
-
-    if (!battleActive) {
-        return;
-    }
-
-    let result =
-        calculateDamage(pet, currentEnemy, type);
-
-    currentEnemy.hp -= result.damage;
-
-    let message =
-        `${pet.name} 使用${type === "physical" ? "物攻" : "魔攻"}，造成 ${result.damage} 點傷害。`;
-
-
-    if (result.reflected) {
-
-        pet.hp -= result.reflection;
-
-        message +=
-            ` 防禦反彈！寵獸受到 ${result.reflection} 點反傷。`;
-    }
-
-
-    addBattleLog(message);
-
-
-    if (currentEnemy.hp <= 0) {
-
-        victory();
-
-        return;
-    }
-
-
-    if (pet.hp <= 0) {
-
-        defeat();
-
-        return;
-    }
-
-
-    enemyTurn();
-}
-
-
-/* =========================================================
-   敵人攻擊
-========================================================= */
-
-function enemyTurn() {
-
-    let physical =
-        calculateDamage(
-            currentEnemy,
-            pet,
-            "physical"
-        );
-
-    let magic =
-        calculateDamage(
-            currentEnemy,
-            pet,
-            "magic"
-        );
-
-    let type;
-
-    if (physical.damage >= magic.damage) {
-        type = "physical";
-    }
-    else {
-        type = "magic";
-    }
-
-    let result =
-        calculateDamage(
-            currentEnemy,
-            pet,
-            type
-        );
-
-    pet.hp -= result.damage;
-
-    let message =
-        `${currentEnemy.name} 使用${type === "physical" ? "物攻" : "魔攻"}，造成 ${result.damage} 點傷害。`;
-
-    if (result.reflected) {
-
-        currentEnemy.hp -= result.reflection;
-
-        message +=
-            ` 防禦反彈！${currentEnemy.name} 受到 ${result.reflection} 點反傷。`;
-    }
-
-    addBattleLog(message);
-
-
-    if (pet.hp <= 0) {
-
-        defeat();
-
-        return;
-    }
-
-    showBattle();
-}
-
-
-/* =========================================================
-   防禦
-========================================================= */
-
-function defend() {
-
-    addBattleLog(
-        `${pet.name} 進入防禦狀態。`
-    );
-
-    enemyTurn();
-}
-
-
-/* =========================================================
-   速度判定
-========================================================= */
-
-function firstTurn() {
-
-    if (pet.spd >= currentEnemy.spd) {
-        return "player";
-    }
-
-    return "enemy";
-}
-
-
-/* =========================================================
-   勝利
-========================================================= */
-
-function victory() {
-
-    battleActive = false;
-
-    let exp = 20 + currentEnemy.level * 10;
-
-    gainExp(exp);
-
-    player.gold += 20;
-
-    materials[currentEnemy.element]++;
-
-    addBattleLog(
-        `🎉 戰鬥勝利！獲得 ${exp} EXP、20 金幣、1 個${elementData[currentEnemy.element].material}。`
-    );
-
-    showBattleResult("勝利");
-}
-
-
-/* =========================================================
-   失敗
-========================================================= */
-
-function defeat() {
-
-    battleActive = false;
-
-    pet.hp = 0;
-
-    showBattleResult("敗北");
-}
-
-
-/* =========================================================
-   戰鬥紀錄
-========================================================= */
-
-let logs = [];
-
-function addBattleLog(text) {
-
-    logs.push(text);
-
-    if (logs.length > 20) {
-        logs.shift();
-    }
-}
-
-
-/* =========================================================
-   商店畫面
+   小舖畫面
 ========================================================= */
 
 function showShop() {
@@ -933,7 +470,7 @@ function showShop() {
             <h2>🏪 御獸小舖</h2>
 
             <p>
-                金幣：💰 ${player.gold}
+                💰 金幣：${player.gold}
             </p>
 
             <div class="menu">
@@ -942,7 +479,7 @@ function showShop() {
                     🐶 查看寵獸
                 </button>
 
-                <button onclick="explore()">
+                <button onclick="showRealms()">
                     🗺️ 秘境探索
                 </button>
 
@@ -956,189 +493,52 @@ function showShop() {
 
         <div class="panel">
 
-            <h2>今日公告</h2>
+            <h2>📖 小舖公告</h2>
 
             <p>
-                歡迎來到御獸小舖。
+                你的核心御獸只有一隻。
             </p>
 
             <p class="small">
-                去秘境尋找素材，培養你的核心御獸。
+                前往不同秘境尋找素材，
+                再利用素材培養寵獸的元素傾向。
             </p>
 
         </div>
+
     `;
 }
 
 
 /* =========================================================
-   寵獸畫面
+   秘境選擇
 ========================================================= */
 
-function showPet() {
-
-    let elementHTML = "";
-
-    for (let key in pet.elements) {
-
-        if (pet.elements[key] > 0.01) {
-
-            elementHTML += `
-                <span class="element">
-                    ${elementData[key].name}
-                    ${pet.elements[key].toFixed(1)}%
-                </span>
-            `;
-        }
-    }
-
-
-    let expPercent =
-        pet.exp / pet.expMax * 100;
-
-
-    let materialButtons = "";
-
-    for (let key in materials) {
-
-        materialButtons += `
-
-            <div class="item">
-
-                <span>
-                    ${elementData[key].name}
-                    ${elementData[key].material}
-                    ×${materials[key]}
-                </span>
-
-                <button
-                    onclick="useMaterial('${key}')"
-                    ${materials[key] <= 0 ? "disabled" : ""}
-                >
-                    使用
-                </button>
-
-            </div>
-        `;
-    }
-
-
-    document.getElementById("app").innerHTML = `
-
-        <div class="panel">
-
-            <button onclick="showShop()">← 返回小舖</button>
-
-            <h2>🐶 ${pet.name}</h2>
-
-            <p>
-                Lv.${pet.level}
-               　
-                EXP ${pet.exp} / ${pet.expMax}
-            </p>
-
-            <div class="bar">
-                <div
-                    class="bar-fill"
-                    style="width:${expPercent}%"
-                ></div>
-            </div>
-
-        </div>
-
-
-        <div class="panel">
-
-            <h2>📊 六圍</h2>
-
-            <div class="stat-grid">
-
-                <div class="stat">❤️ 生命：${pet.hp} / ${pet.maxHp}</div>
-                <div class="stat">⚔️ 物理攻擊：${pet.patk}</div>
-
-                <div class="stat">🔮 魔法攻擊：${pet.matk}</div>
-                <div class="stat">🛡️ 物理防禦：${pet.pdef}</div>
-
-                <div class="stat">🧿 魔法防禦：${pet.mdef}</div>
-                <div class="stat">💨 速度：${pet.spd}</div>
-
-            </div>
-
-        </div>
-
-
-        <div class="panel">
-
-            <h2>🧬 資質</h2>
-
-            <p>
-                固定資質：${pet.aptitude.toFixed(2)}
-            </p>
-
-            <p class="small">
-                資質決定成長效率，正常培育無法改變。
-            </p>
-
-        </div>
-
-
-        <div class="panel">
-
-            <h2>🌟 元素傾向</h2>
-
-            ${elementHTML}
-
-            <hr>
-
-            <p>
-                <strong>
-                    目前進化方向：
-                </strong>
-            </p>
-
-            <p class="warning">
-                ${getEvolutionType()}
-            </p>
-
-        </div>
-
-
-        <div class="panel">
-
-            <h2>🧪 使用素材</h2>
-
-            ${materialButtons}
-
-        </div>
-    `;
-}
-
-
-/* =========================================================
-   素材庫
-========================================================= */
-
-function showMaterials() {
+function showRealms() {
 
     let html = "";
 
-    for (let key in materials) {
+    for (let realm of realms) {
 
         html += `
 
-            <div class="item">
-
-                <span>
-                    ${elementData[key].name}
-                    ${elementData[key].material}
-                </span>
+            <button
+                class="realm-button"
+                onclick="enterRealm('${realm}')"
+            >
 
                 <strong>
-                    ×${materials[key]}
+                    ${elementData[realm].realm}
                 </strong>
 
-            </div>
+                <span>
+                    主要素材：${elementData[realm].material}
+                </span>
+
+            </button>
+
         `;
+
     }
 
 
@@ -1150,22 +550,227 @@ function showMaterials() {
                 ← 返回小舖
             </button>
 
-            <h2>🎒 素材庫</h2>
+            <h2>🗺️ 秘境選擇</h2>
+
+            <p class="small">
+                選擇你想探索的元素秘境。
+            </p>
 
             ${html}
 
         </div>
+
     `;
 }
 
 
 /* =========================================================
-   探索畫面
+   進入秘境
 ========================================================= */
 
-function showExplore() {
+function enterRealm(element) {
+
+    currentRealm = element;
+
+    wildPets = [];
+
+    let availableCores = [...growthCores];
+
+    for (let i = 0; i < 5; i++) {
+
+        let randomIndex =
+            Math.floor(Math.random() * availableCores.length);
+
+        let selectedCore =
+            availableCores.splice(randomIndex, 1)[0];
+
+        wildPets.push(
+            createWildPet(element, selectedCore)
+        );
+
+    }
+
+    showWildPets();
+
+}
+
+
+/* =========================================================
+   建立野生御獸
+========================================================= */
+
+function createWildPet(element, growthCore) {
+
+    let difference =
+        Math.floor(Math.random() * 5) - 2;
+
+    let level =
+        pet.level + difference;
+
+    if (level < 1) {
+        level = 1;
+    }
+
+
+    /*
+        基礎數值
+
+        Lv1：
+
+        HP 12
+        四種攻防 5
+        速度 5
+
+        核心會提高成長。
+    */
+
+    let hp = 12;
+    let patk = 5;
+    let matk = 5;
+    let pdef = 5;
+    let mdef = 5;
+    let spd = 5;
+
+
+    let levelUpCount = level - 1;
+
+
+    for (let i = 0; i < levelUpCount; i++) {
+
+        /*
+            HP：
+
+            一般 +2
+            HP核心 +3
+        */
+
+        if (growthCore.includes("hp")) {
+            hp += 3;
+        }
+        else {
+            hp += 2;
+        }
+
+
+        /*
+            四種攻防：
+
+            核心 +2
+            非核心 +1
+        */
+
+        if (growthCore.includes("patk")) {
+            patk += 2;
+        }
+        else {
+            patk += 1;
+        }
+
+        if (growthCore.includes("matk")) {
+            matk += 2;
+        }
+        else {
+            matk += 1;
+        }
+
+        if (growthCore.includes("pdef")) {
+            pdef += 2;
+        }
+        else {
+            pdef += 1;
+        }
+
+        if (growthCore.includes("mdef")) {
+            mdef += 2;
+        }
+        else {
+            mdef += 1;
+        }
+
+
+        /*
+            速度：
+
+            一般 +1
+            速度核心 +2
+        */
+
+        if (growthCore.includes("spd")) {
+            spd += 2;
+        }
+        else {
+            spd += 1;
+        }
+
+    }
+
+
+    let names = {
+
+        fire: ["赤焰狼", "炎尾狐", "火甲熊", "熔岩犬", "火羽鳥"],
+
+        water: ["水靈狐", "碧波龜", "潮汐鹿", "水刃魚", "寒泉獸"],
+
+        wood: ["青木鹿", "森林兔", "藤蔓蛇", "木靈狐", "森之犬"],
+
+        ice: ["寒冰犬", "冰晶狐", "雪原狼", "霜角鹿", "冰甲獸"],
+
+        thunder: ["雷牙獸", "雷鳴狼", "閃電狐", "雷角鹿", "電光犬"],
+
+        earth: ["岩甲熊", "大地龜", "岩石犬", "山嶽獸", "土靈鹿"],
+
+        wind: ["疾風貓", "風羽鳥", "迅風狼", "旋風狐", "飛羽獸"],
+
+        light: ["月光兔", "聖光鹿", "光羽鳥", "耀光犬", "晨曦狐"],
+
+        dark: ["暗影狐", "夜刃狼", "幽影犬", "暗月貓", "黑霧獸"]
+
+    };
+
+
+    let list = names[element];
+
+    let name =
+        list[Math.floor(Math.random() * list.length)];
+
+
+    return {
+
+        name: name,
+
+        level: level,
+
+        hp: hp,
+
+        maxHp: hp,
+
+        patk: patk,
+
+        matk: matk,
+
+        pdef: pdef,
+
+        mdef: mdef,
+
+        spd: spd,
+
+        growthCore: growthCore,
+
+        element: element
+
+    };
+
+}
+
+
+/* =========================================================
+   顯示五隻野生御獸
+========================================================= */
+
+function showWildPets() {
 
     let cards = "";
+
 
     wildPets.forEach((enemy, index) => {
 
@@ -1177,10 +782,7 @@ function showExplore() {
 
         cards += `
 
-            <div
-                class="card enemy-card"
-                onclick="startBattle(${index})"
-            >
+            <div class="card enemy-card">
 
                 <h3>
                     ${enemy.name}
@@ -1197,41 +799,46 @@ function showExplore() {
                 <div class="stat-grid">
 
                     <div class="stat">
-                        ❤️ ${enemy.hp}
+                        ❤️ 生命：${enemy.hp}
                     </div>
 
                     <div class="stat">
-                        ⚔️ ${enemy.patk}
+                        ⚔️ 物攻：${enemy.patk}
                     </div>
 
                     <div class="stat">
-                        🔮 ${enemy.matk}
+                        🔮 魔攻：${enemy.matk}
                     </div>
 
                     <div class="stat">
-                        🛡️ ${enemy.pdef}
+                        🛡️ 物防：${enemy.pdef}
                     </div>
 
                     <div class="stat">
-                        🧿 ${enemy.mdef}
+                        🧿 魔防：${enemy.mdef}
                     </div>
 
                     <div class="stat">
-                        💨 ${enemy.spd}
+                        💨 速度：${enemy.spd}
                     </div>
 
                 </div>
 
-                <p class="small">
-                    成長核心：${coreNames}
+                <p>
+                    🌱 成長核心：
+                    <strong>${coreNames}</strong>
                 </p>
 
-                <button>
-                    選擇
+                <button
+                    onclick="startBattle(${index})"
+                >
+                    ⚔️ 開始戰鬥
                 </button>
 
             </div>
+
         `;
+
     });
 
 
@@ -1239,57 +846,811 @@ function showExplore() {
 
         <div class="panel">
 
-            <button onclick="showShop()">
-                ← 返回小舖
+            <button onclick="showRealms()">
+                ← 返回秘境
             </button>
 
-            <h2>🗺️ 新手森林</h2>
+            <h2>
+                ${elementData[currentRealm].realm}
+            </h2>
 
             <p class="small">
-                發現了 ${wildPets.length} 隻野生御獸。
-                選擇一隻開始戰鬥。
+                這個秘境出現了 5 隻野生御獸。
+                選擇你想挑戰的對象。
             </p>
 
         </div>
 
         <div class="grid">
+
             ${cards}
-        </div>
-
-        <div class="center">
-
-            <button onclick="explore()">
-                🔄 重新探索
-            </button>
 
         </div>
+
     `;
+
 }
 
 
 /* =========================================================
-   六圍名稱
+   EXP
 ========================================================= */
 
-function statName(stat) {
+function getExpMax(level) {
 
-    const names = {
+    if (level <= 10) {
 
-        hp: "生命",
+        return 100 + (level - 1) * 10;
 
-        patk: "物理攻擊",
+    }
+    else if (level <= 20) {
 
-        matk: "魔法攻擊",
+        return 300 + (level - 11) * 50;
 
-        pdef: "物理防禦",
+    }
+    else if (level <= 30) {
 
-        mdef: "魔法防禦",
+        return 1000 + (level - 21) * 100;
 
-        spd: "速度"
+    }
+    else {
+
+        return 4000 + (level - 31) * 500;
+
+    }
+
+}
+
+
+/* =========================================================
+   獲得 EXP
+========================================================= */
+
+function gainExp(amount) {
+
+    pet.exp += amount;
+
+
+    while (pet.exp >= pet.expMax) {
+
+        pet.exp -= pet.expMax;
+
+        levelUp();
+
+        pet.expMax =
+            getExpMax(pet.level);
+
+    }
+
+}
+
+
+/* =========================================================
+   升級
+========================================================= */
+
+function levelUp() {
+
+    pet.level++;
+
+    pet.maxHp += 2;
+
+    pet.hp = pet.maxHp;
+
+    pet.patk++;
+
+    pet.matk++;
+
+    pet.pdef++;
+
+    pet.mdef++;
+
+    pet.spd++;
+
+}
+
+
+/* =========================================================
+   元素比例正規化
+========================================================= */
+
+function normalizeElements() {
+
+    let total = 0;
+
+
+    for (let key in pet.elements) {
+
+        total += pet.elements[key];
+
+    }
+
+
+    if (total === 0) {
+        return;
+    }
+
+
+    for (let key in pet.elements) {
+
+        pet.elements[key] =
+            pet.elements[key] / total * 100;
+
+    }
+
+}
+
+
+/* =========================================================
+   使用素材
+========================================================= */
+
+function useMaterial(element) {
+
+    if (materials[element] <= 0) {
+
+        alert("沒有這個素材！");
+
+        return;
+    }
+
+
+    materials[element]--;
+
+
+    /*
+        第一次使用素材：
+
+        直接形成100%元素傾向。
+    */
+
+    if (getElementTotal() === 0) {
+
+        for (let key in pet.elements) {
+
+            pet.elements[key] = 0;
+
+        }
+
+        pet.elements[element] = 100;
+
+    }
+    else {
+
+        /*
+            已經有元素傾向：
+
+            所有原本元素保留90%
+            新元素增加10%
+
+            再重新正規化。
+        */
+
+        for (let key in pet.elements) {
+
+            pet.elements[key] *= 0.90;
+
+        }
+
+        pet.elements[element] += 10;
+
+        normalizeElements();
+
+    }
+
+
+    showPet();
+
+}
+
+
+/* =========================================================
+   元素總量
+========================================================= */
+
+function getElementTotal() {
+
+    let total = 0;
+
+
+    for (let key in pet.elements) {
+
+        total += pet.elements[key];
+
+    }
+
+
+    return total;
+
+}
+
+
+/* =========================================================
+   進化方向
+========================================================= */
+
+function getEvolutionType() {
+
+    let list =
+        Object.entries(pet.elements)
+        .sort((a, b) => b[1] - a[1]);
+
+
+    let top1 = list[0];
+
+    let top2 = list[1];
+
+    let top3 = list[2];
+
+
+    /*
+        單屬性：
+
+        第一名 > 80%
+    */
+
+    if (top1[1] > 80) {
+
+        return `${elementData[top1[0]].name} 單屬性進化`;
+
+    }
+
+
+    /*
+        雙屬性：
+
+        前兩名各 > 40%
+        且總和 > 80%
+    */
+
+    if (
+
+        top1[1] > 40 &&
+        top2[1] > 40 &&
+        top1[1] + top2[1] > 80
+
+    ) {
+
+        return `${elementData[top1[0]].name} ＋ ${elementData[top2[0]].name} 雙屬性進化`;
+
+    }
+
+
+    /*
+        三屬性：
+
+        前三名各 > 20%
+        且總和 > 80%
+    */
+
+    if (
+
+        top1[1] > 20 &&
+        top2[1] > 20 &&
+        top3[1] > 20 &&
+        top1[1] + top2[1] + top3[1] > 80
+
+    ) {
+
+        return `${elementData[top1[0]].name} ＋ ${elementData[top2[0]].name} ＋ ${elementData[top3[0]].name} 三屬性進化`;
+
+    }
+
+
+    return "目前尚未形成明確進化方向";
+
+}
+
+
+/* =========================================================
+   開始戰鬥
+========================================================= */
+
+function startBattle(index) {
+
+    currentEnemy =
+        wildPets[index];
+
+    currentEnemyIndex = index;
+
+    battleActive = true;
+
+    logs = [];
+
+    pet.hp = pet.maxHp;
+
+
+    addBattleLog(
+        `⚔️ 遭遇 ${currentEnemy.name}！`
+    );
+
+
+    addBattleLog(
+        `🐶 ${pet.name} Lv.${pet.level}`
+    );
+
+
+    addBattleLog(
+        `👾 ${currentEnemy.name} Lv.${currentEnemy.level}`
+    );
+
+
+    showBattle();
+
+
+    /*
+        速度較快者先行動。
+
+        玩家先：
+        玩家直接操作。
+
+        敵人先：
+        延遲後自動攻擊。
+    */
+
+    if (currentEnemy.spd > pet.spd) {
+
+        setTimeout(() => {
+
+            if (battleActive) {
+
+                enemyTurn();
+
+            }
+
+        }, 700);
+
+    }
+
+}
+
+
+/* =========================================================
+   計算傷害
+========================================================= */
+
+function calculateDamage(attacker, defender, type) {
+
+    let attack;
+
+    let defense;
+
+
+    if (type === "physical") {
+
+        attack = attacker.patk;
+
+        defense = defender.pdef;
+
+    }
+    else if (type === "magic") {
+
+        attack = attacker.matk;
+
+        defense = defender.mdef;
+
+    }
+    else {
+
+        return {
+
+            damage: 0,
+
+            reflected: false,
+
+            reflection: 0
+
+        };
+
+    }
+
+
+    let difference =
+        attack - defense;
+
+
+    /*
+        攻擊 > 防禦
+
+        正常造成差值傷害
+    */
+
+    if (difference > 0) {
+
+        return {
+
+            damage: difference,
+
+            reflected: false,
+
+            reflection: 0
+
+        };
+
+    }
+
+
+    /*
+        攻擊 = 防禦
+
+        雙方0傷害
+    */
+
+    if (difference === 0) {
+
+        return {
+
+            damage: 0,
+
+            reflected: false,
+
+            reflection: 0
+
+        };
+
+    }
+
+
+    /*
+        攻擊 < 防禦
+
+        防禦者受到0傷害
+
+        攻擊者受到100%自身攻擊力反傷
+    */
+
+    return {
+
+        damage: 0,
+
+        reflected: true,
+
+        reflection: attack
 
     };
 
-    return names[stat];
+}
+
+
+/* =========================================================
+   玩家攻擊
+========================================================= */
+
+function playerAttack(type) {
+
+    if (!battleActive) {
+        return;
+    }
+
+
+    /*
+        如果敵人速度較快，
+        戰鬥開始時已經自動攻擊。
+    */
+
+    let result =
+        calculateDamage(
+            pet,
+            currentEnemy,
+            type
+        );
+
+
+    currentEnemy.hp -= result.damage;
+
+
+    let message =
+        `🐶 ${pet.name} 使用${type === "physical" ? "物攻" : "魔攻"}，造成 ${result.damage} 點傷害。`;
+
+
+    if (result.reflected) {
+
+        pet.hp -= result.reflection;
+
+        message +=
+            ` 🛡️ 防禦反彈！受到 ${result.reflection} 點反傷。`;
+
+    }
+
+
+    addBattleLog(message);
+
+
+    if (currentEnemy.hp <= 0) {
+
+        victory();
+
+        return;
+
+    }
+
+
+    if (pet.hp <= 0) {
+
+        defeat();
+
+        return;
+
+    }
+
+
+    /*
+        速度 ≥ 敵人1.5倍：
+
+        本回合第二次攻擊。
+
+        第二次攻擊不重新判定速度。
+    */
+
+    if (pet.spd >= currentEnemy.spd * 1.5) {
+
+        let secondResult =
+            calculateDamage(
+                pet,
+                currentEnemy,
+                type
+            );
+
+
+        currentEnemy.hp -=
+            secondResult.damage;
+
+
+        let secondMessage =
+            `⚡ 速度優勢！再次攻擊，造成 ${secondResult.damage} 點傷害。`;
+
+
+        if (secondResult.reflected) {
+
+            pet.hp -=
+                secondResult.reflection;
+
+            secondMessage +=
+                ` 🛡️ 防禦反彈！受到 ${secondResult.reflection} 點反傷。`;
+
+        }
+
+
+        addBattleLog(secondMessage);
+
+
+        if (currentEnemy.hp <= 0) {
+
+            victory();
+
+            return;
+
+        }
+
+
+        if (pet.hp <= 0) {
+
+            defeat();
+
+            return;
+
+        }
+
+    }
+
+
+    enemyTurn();
+
+}
+
+
+/* =========================================================
+   敵人選擇攻擊方式
+========================================================= */
+
+function chooseEnemyAttack() {
+
+    let physical =
+        calculateDamage(
+            currentEnemy,
+            pet,
+            "physical"
+        );
+
+
+    let magic =
+        calculateDamage(
+            currentEnemy,
+            pet,
+            "magic"
+        );
+
+
+    if (physical.damage >= magic.damage) {
+
+        return "physical";
+
+    }
+    else {
+
+        return "magic";
+
+    }
+
+}
+
+
+/* =========================================================
+   敵人攻擊
+========================================================= */
+
+function enemyTurn() {
+
+    if (!battleActive) {
+        return;
+    }
+
+
+    let type =
+        chooseEnemyAttack();
+
+
+    let result =
+        calculateDamage(
+            currentEnemy,
+            pet,
+            type
+        );
+
+
+    pet.hp -= result.damage;
+
+
+    let message =
+        `👾 ${currentEnemy.name} 使用${type === "physical" ? "物攻" : "魔攻"}，造成 ${result.damage} 點傷害。`;
+
+
+    if (result.reflected) {
+
+        currentEnemy.hp -=
+            result.reflection;
+
+
+        message +=
+            ` 🛡️ 防禦反彈！${currentEnemy.name} 受到 ${result.reflection} 點反傷。`;
+
+    }
+
+
+    addBattleLog(message);
+
+
+    if (currentEnemy.hp <= 0) {
+
+        victory();
+
+        return;
+
+    }
+
+
+    if (pet.hp <= 0) {
+
+        defeat();
+
+        return;
+
+    }
+
+
+    showBattle();
+
+}
+
+
+/* =========================================================
+   防禦
+========================================================= */
+
+function defend() {
+
+    if (!battleActive) {
+        return;
+    }
+
+
+    /*
+        目前防禦：
+
+        本回合不攻擊，
+        讓敵人先攻。
+
+        之後可以再加入真正的防禦倍率。
+    */
+
+    addBattleLog(
+        "🛡️ 寵獸選擇防禦。"
+    );
+
+
+    enemyTurn();
+
+}
+
+
+/* =========================================================
+   勝利
+========================================================= */
+
+function victory() {
+
+    battleActive = false;
+
+
+    let exp =
+        25 + currentEnemy.level * 10;
+
+
+    gainExp(exp);
+
+
+    player.gold += 20;
+
+
+    materials[currentRealm]++;
+
+
+    addBattleLog(
+        `🎉 戰鬥勝利！`
+    );
+
+
+    addBattleLog(
+        `✨ 獲得 ${exp} EXP`
+    );
+
+
+    addBattleLog(
+        `💰 獲得 20 金幣`
+    );
+
+
+    addBattleLog(
+        `🧪 獲得 1 個${elementData[currentRealm].material}`
+    );
+
+
+    showBattleResult("勝利");
+
+}
+
+
+/* =========================================================
+   敗北
+========================================================= */
+
+function defeat() {
+
+    battleActive = false;
+
+    pet.hp = 0;
+
+
+    showBattleResult("敗北");
+
+}
+
+
+/* =========================================================
+   戰鬥紀錄
+========================================================= */
+
+function addBattleLog(text) {
+
+    logs.push(text);
+
+
+    if (logs.length > 20) {
+
+        logs.shift();
+
+    }
+
 }
 
 
@@ -1299,15 +1660,30 @@ function statName(stat) {
 
 function showBattle() {
 
-    let playerFirst =
-        firstTurn() === "player";
+    if (!currentEnemy) {
+        return;
+    }
+
+
+    let first = "你";
+
+
+    if (currentEnemy.spd > pet.spd) {
+
+        first = "敵人";
+
+    }
 
 
     document.getElementById("app").innerHTML = `
 
         <div class="panel">
 
-            <h2>⚔️ 戰鬥</h2>
+            <button onclick="leaveBattle()">
+                ← 放棄戰鬥
+            </button>
+
+            <h2>⚔️ ${elementData[currentRealm].realm}</h2>
 
             <div class="grid">
 
@@ -1327,7 +1703,19 @@ function showBattle() {
                     </p>
 
                     <p>
-                        💨 速度：${pet.spd}
+                        ⚔️ ${pet.patk}
+                       　
+                        🔮 ${pet.matk}
+                    </p>
+
+                    <p>
+                        🛡️ ${pet.pdef}
+                       　
+                        🧿 ${pet.mdef}
+                    </p>
+
+                    <p>
+                        💨 ${pet.spd}
                     </p>
 
                 </div>
@@ -1349,18 +1737,35 @@ function showBattle() {
                     </p>
 
                     <p>
-                        💨 速度：${currentEnemy.spd}
+                        ⚔️ ${currentEnemy.patk}
+                       　
+                        🔮 ${currentEnemy.matk}
+                    </p>
+
+                    <p>
+                        🛡️ ${currentEnemy.pdef}
+                       　
+                        🧿 ${currentEnemy.mdef}
+                    </p>
+
+                    <p>
+                        💨 ${currentEnemy.spd}
+                    </p>
+
+                    <p>
+                        🌱 成長核心：
+                        ${currentEnemy.growthCore
+                            .map(statName)
+                            .join(" ＋ ")}
                     </p>
 
                 </div>
 
             </div>
 
-            <p class="${playerFirst ? "good" : "warning"}">
+            <p class="${first === "你" ? "good" : "warning"}">
 
-                ${playerFirst
-                    ? "⚡ 你的速度較快，你先行動。"
-                    : "⚡ 敵人的速度較快，敵人先行動。"}
+                ⚡ ${first}先行動
 
             </p>
 
@@ -1397,7 +1802,24 @@ function showBattle() {
             </div>
 
         </div>
+
     `;
+
+}
+
+
+/* =========================================================
+   離開戰鬥
+========================================================= */
+
+function leaveBattle() {
+
+    battleActive = false;
+
+    currentEnemy = null;
+
+    showWildPets();
+
 }
 
 
@@ -1412,49 +1834,344 @@ function showBattleResult(result) {
         <div class="panel center">
 
             <h1>
-                ${result === "勝利" ? "🎉 戰鬥勝利！" : "💀 戰鬥失敗"}
+                ${
+                    result === "勝利"
+                    ? "🎉 戰鬥勝利！"
+                    : "💀 戰鬥失敗"
+                }
             </h1>
 
             ${
                 result === "勝利"
+
                 ?
+
                 `
+
                 <p>
-                    獲得 EXP、金幣與元素素材。
+                    ${currentEnemy.name}
+                    已被擊敗。
                 </p>
 
-                <button onclick="explore()">
-                    🗺️ 繼續探索
+                <button onclick="showWildPets()">
+                    🗺️ 繼續挑戰其他御獸
                 </button>
+
+                <button onclick="showRealms()">
+                    🌍 換一個秘境
+                </button>
+
+                <button onclick="showShop()">
+                    🏪 回到小舖
+                </button>
+
                 `
+
                 :
+
                 `
-                <p>
+
+                <p class="danger">
                     寵獸倒下了。
+                </p>
+
+                <p>
+                    目前遊戲會直接結束本次冒險。
                 </p>
 
                 <button onclick="restartGame()">
                     🔄 重新開始
                 </button>
+
                 `
+
             }
 
-            <button onclick="showShop()">
-                🏪 回到小舖
-            </button>
-
         </div>
+
 
         <div class="panel">
 
             <h3>📜 戰鬥紀錄</h3>
 
             <div class="battle-log">
+
                 ${logs.join("<br>")}
+
             </div>
 
         </div>
+
     `;
+
+}
+
+
+/* =========================================================
+   素材庫
+========================================================= */
+
+function showMaterials() {
+
+    let html = "";
+
+
+    for (let key in materials) {
+
+        html += `
+
+            <div class="item">
+
+                <span>
+                    ${elementData[key].name}
+                    ${elementData[key].material}
+                </span>
+
+                <strong>
+                    ×${materials[key]}
+                </strong>
+
+            </div>
+
+        `;
+
+    }
+
+
+    document.getElementById("app").innerHTML = `
+
+        <div class="panel">
+
+            <button onclick="showShop()">
+                ← 返回小舖
+            </button>
+
+            <h2>🎒 素材庫</h2>
+
+            ${html}
+
+        </div>
+
+    `;
+
+}
+
+
+/* =========================================================
+   寵獸畫面
+========================================================= */
+
+function showPet() {
+
+    let elementHTML = "";
+
+
+    for (let key in pet.elements) {
+
+        if (pet.elements[key] > 0.01) {
+
+            elementHTML += `
+
+                <span class="element">
+
+                    ${elementData[key].name}
+
+                    ${pet.elements[key].toFixed(1)}%
+
+                </span>
+
+            `;
+
+        }
+
+    }
+
+
+    let expPercent =
+        pet.exp / pet.expMax * 100;
+
+
+    let materialHTML = "";
+
+
+    for (let key in materials) {
+
+        materialHTML += `
+
+            <div class="item">
+
+                <span>
+
+                    ${elementData[key].name}
+
+                    ${elementData[key].material}
+
+                    ×${materials[key]}
+
+                </span>
+
+
+                <button
+                    onclick="useMaterial('${key}')"
+                    ${materials[key] <= 0 ? "disabled" : ""}
+                >
+
+                    使用
+
+                </button>
+
+            </div>
+
+        `;
+
+    }
+
+
+    document.getElementById("app").innerHTML = `
+
+        <div class="panel">
+
+            <button onclick="showShop()">
+                ← 返回小舖
+            </button>
+
+            <h2>
+                🐶 ${pet.name}
+            </h2>
+
+            <p>
+                Lv.${pet.level}
+               　
+                EXP ${pet.exp} / ${pet.expMax}
+            </p>
+
+            <div class="bar">
+
+                <div
+                    class="bar-fill"
+                    style="width:${expPercent}%"
+                ></div>
+
+            </div>
+
+        </div>
+
+
+        <div class="panel">
+
+            <h2>📊 六圍</h2>
+
+            <div class="stat-grid">
+
+                <div class="stat">
+                    ❤️ 生命：${pet.hp} / ${pet.maxHp}
+                </div>
+
+                <div class="stat">
+                    ⚔️ 物理攻擊：${pet.patk}
+                </div>
+
+                <div class="stat">
+                    🔮 魔法攻擊：${pet.matk}
+                </div>
+
+                <div class="stat">
+                    🛡️ 物理防禦：${pet.pdef}
+                </div>
+
+                <div class="stat">
+                    🧿 魔法防禦：${pet.mdef}
+                </div>
+
+                <div class="stat">
+                    💨 速度：${pet.spd}
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <div class="panel">
+
+            <h2>🧬 資質</h2>
+
+            <p>
+                固定資質：${pet.aptitude.toFixed(2)}
+            </p>
+
+            <p class="small">
+                資質在出生時決定，
+                正常培育不會改變。
+            </p>
+
+        </div>
+
+
+        <div class="panel">
+
+            <h2>🌟 元素傾向</h2>
+
+            ${
+                elementHTML ||
+                `<p class="small">
+                    目前沒有任何元素傾向。
+                </p>`
+            }
+
+            <hr>
+
+            <p>
+                <strong>
+                    目前進化方向
+                </strong>
+            </p>
+
+            <p class="warning">
+                ${getEvolutionType()}
+            </p>
+
+        </div>
+
+
+        <div class="panel">
+
+            <h2>🧪 使用素材</h2>
+
+            ${materialHTML}
+
+        </div>
+
+    `;
+
+}
+
+
+/* =========================================================
+   六圍名稱
+========================================================= */
+
+function statName(stat) {
+
+    const names = {
+
+        hp: "生命",
+
+        patk: "物理攻擊",
+
+        matk: "魔法攻擊",
+
+        pdef: "物理防禦",
+
+        mdef: "魔法防禦",
+
+        spd: "速度"
+
+    };
+
+
+    return names[stat];
+
 }
 
 
