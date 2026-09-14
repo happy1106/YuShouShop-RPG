@@ -1,127 +1,739 @@
 <!DOCTYPE html>
-<html>
-<head><title>御獸小舖 RPG</title></head>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>一格塔防</title>
+
+<style>
+    * {
+        box-sizing: border-box;
+    }
+
+    body {
+        margin: 0;
+        background: #20242b;
+        color: white;
+        font-family: Arial, sans-serif;
+        text-align: center;
+    }
+
+    h1 {
+        margin: 20px 0 10px;
+    }
+
+    #info {
+        display: flex;
+        justify-content: center;
+        gap: 20px;
+        margin-bottom: 15px;
+        font-size: 18px;
+    }
+
+    #game {
+        width: min(95vw, 500px);
+        margin: auto;
+    }
+
+    #map {
+        display: grid;
+        grid-template-columns: repeat(7, 1fr);
+        gap: 3px;
+        background: #111;
+        padding: 3px;
+        border-radius: 8px;
+    }
+
+    .cell {
+        aspect-ratio: 1 / 1;
+        background: #4b5963;
+        border: 1px solid #687681;
+        position: relative;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: clamp(20px, 7vw, 36px);
+        user-select: none;
+    }
+
+    .road {
+        background: #9a805c;
+        cursor: default;
+    }
+
+    .tower {
+        background: #315b7a;
+    }
+
+    .tower.selected {
+        outline: 3px solid white;
+    }
+
+    .enemy {
+        position: absolute;
+        font-size: clamp(22px, 7vw, 34px);
+        z-index: 5;
+    }
+
+    .hp-bar {
+        position: absolute;
+        top: 3px;
+        left: 10%;
+        width: 80%;
+        height: 5px;
+        background: #333;
+        border-radius: 5px;
+        overflow: hidden;
+    }
+
+    .hp-fill {
+        height: 100%;
+        background: #55d66b;
+    }
+
+    #controls {
+        margin-top: 15px;
+        display: flex;
+        justify-content: center;
+        gap: 10px;
+        flex-wrap: wrap;
+    }
+
+    button {
+        border: none;
+        border-radius: 8px;
+        padding: 12px 18px;
+        font-size: 16px;
+        cursor: pointer;
+    }
+
+    button:disabled {
+        opacity: 0.4;
+        cursor: not-allowed;
+    }
+
+    #message {
+        min-height: 25px;
+        margin: 12px;
+        color: #ffd86b;
+    }
+
+    #towerInfo {
+        margin-top: 10px;
+        min-height: 50px;
+        color: #ddd;
+    }
+</style>
+</head>
+
 <body>
-    <!-- 遊戲首頁 -->
-    <h1>御獸小舖 RPG</h1>
-    <p>歡迎來到御獸世界！</p>
-    <button onclick="sayHello()">開始遊戲</button>
+
+<h1>🏰 一格塔防</h1>
+
+<div id="game">
+
+    <div id="info">
+        <div>❤️ <span id="life">10</span></div>
+        <div>💰 <span id="gold">100</span></div>
+        <div>🌊 第 <span id="wave">0</span> 波</div>
+    </div>
+
+    <div id="map"></div>
+
+    <div id="message">
+        點擊空地建造防禦塔
+    </div>
+
+    <div id="controls">
+        <button id="startWave">開始下一波</button>
+        <button id="upgrade" disabled>⬆️ 升級塔</button>
+    </div>
+
+    <div id="towerInfo">
+        尚未選擇防禦塔
+    </div>
+
+</div>
+
 <script>
-// 主角資料
-let character = {
-    name: "小犬",    level: 1,    exp: 0,    expMax: 100,
-    hp: 6,    patk: 6,    matk: 6,    pdef: 6,    mdef: 6,    spd: 6    }    ;
-let enemy     = {
-    name: "赤焰狼",    level: 1,
-    hp: 10,    patk: 7,    matk: 5,    pdef: 6,    mdef: 5,   spd: 8    }    ;
-// 顯示主角資料
-function showDog() {
-document.body.innerHTML = `
-    <h1>我的小犬</h1>
-    <p>    Lv ：${character.level}</p>
-    <p>    EXP：${character. exp}  /  ${character.expMax}</p>
-    <p id="characterHp">❤️ 生命：${character.hp}</p>
-    <p>⚔️ 物攻：${character.patk}</p>
-    <p>🔮 魔攻：${character.matk}</p>
-    <p>🛡️ 物防：${character.pdef}</p>
-    <p>🧿 魔防：${character.mdef}</p>
-    <p>💨 速度：${character. spd}</p>
-    <button onclick="gainExp(10); showDog()">獲得 10 EXP</button>
 
-<hr>
-    <h2>野生寵獸</h2>
-    <p>${enemy.name} Lv.${enemy.level}</p>
-    <p>❤️ 生命：${enemy.  hp}</p>
-    <p>⚔️ 物攻：${enemy.patk}</p>
-    <p>🔮 魔攻：${enemy.matk}</p>
-    <p>🛡️ 物防：${enemy.pdef}</p>
-    <p>🧿 魔防：${enemy.mdef}</p>
-    <p>💨 速度：${enemy. spd}</p>
-    <button onclick="startBattle()">開始戰鬥</button>            `;    }
+/* =========================
+   基本設定
+========================= */
 
-function startBattle() {
-document.body.innerHTML = `
-    <h1>戰鬥開始！</h1>
-    
-    <h2>${character.name}  Lv.${character.level}</h2>
-    <p>id="characterHp">❤️ 生命：${character.hp}</p>
-    <hr>
-    <h2>${enemy.name}      Lv.${enemy.level}    </h2>
-    <p id="enemyHp">    ❤️ 生命：${enemy.hp}    </p>
+const ROWS = 5;
+const COLS = 7;
 
-    <p id="battleMessage">請選擇行動</p>
+let life = 10;
+let gold = 100;
+let wave = 0;
 
-<hr>
-  <button onclick="attack(character, enemy, 'physical' )">物攻</button>
-  <button onclick="attack(character, enemy, 'magic'    )">魔攻</button>
-  <button onclick="defend         (                    )">防禦</button>
-  <button onclick="escape         (                    )">逃跑</button> `;   
-startTurn();}
+let enemies = [];
+let towers = [];
 
-function enemyTurn() {
-    let enemyType = chooseEnemyAttack();
-    attack(enemy, character, enemyType)  ;  }  
-  
-function startTurn() {
-  let firstAttacker = decideFirstAttacker();
-  if   (firstAttacker === character) {
-        document.getElementById("battleMessage").innerHTML
-        = `${character.name}  先攻！`;                }
-  else {document.getElementById("battleMessage").innerHTML
-        = `${enemy.name}      先攻！`;    enemyTurn();}  }    
-    
- function attack(attacker, defender, type) {
-    let attack;  let defense;  let message;
-    if     (type === "physical" ) {
-        attack = attacker.patk; defense = defender.pdef;  message = "物理";    }
-    else if(type === "magic"    ) {
-        attack = attacker.matk; defense = defender.mdef;  message = "魔法";    }
-    else {    return        ;    }
-    let damage = calculateDamage(attack, defense);    defender.hp -= damage;
-  document.getElementById("enemyHp"      ).innerHTML =
-        `❤️ 生命：${enemy.hp}            `;
-  document.getElementById("characterHp"  ).innerHTML =
-        `❤️ 生命：${character.hp}        `;
-  document.getElementById("battleMessage").innerHTML =
-        `${attacker.name} 對 ${defender.name} 造成 ${damage} 點${message}傷害！`;
-    if (attacker === character) {
-    let enemyType = chooseEnemyAttack();attack(enemy, character, enemyType)    ;}}
+let waveRunning = false;
+let selectedTower = null;
 
- function decideFirstAttacker() {
-    if      (character.spd > enemy.spd) {return character;  }
-    else if (enemy.spd > character.spd) {return enemy    ;  }
-    else                                {return character;  }   
- }
-    
+let enemyId = 0;
 
-function calculateDamage(attack, defense) {
-    let damage = attack - defense;
-    if (damage < 0) {        damage = 0;  }
-    return damage                      ;  }
-function chooseEnemyAttack() {
-    let physicalDamage  = calculateDamage(enemy.patk, character.pdef);
-    let magicDamage     = calculateDamage(enemy.matk, character.mdef);
-    if (physicalDamage >= magicDamage) {return "physical";    }
-    else                               {return "magic"   ;    }}
-    
-  
-// 開始遊戲
-function sayHello() {        showDog();    }
-// 主角升級
-function getExpMax(level) {
-    if (level <= 10) {        return  100 + (level -  1) *  10;    }
-    if (level <= 20) {        return  300 + (level - 11) *  50;    }
-    if (level <= 30) {        return 1000 + (level - 21) * 100;    }
-                              return 4000 + (level - 31) * 500;    } 
-function gainExp(amount) {
-    character.exp += amount;
-    if (character.exp >= character.expMax) {
-        character.exp -= character.expMax;
-        levelUp();
-        character.expMax = getExpMax(character.level)        ;    }    showDog()    ;    }
-function levelUp() {
-    character.level += 1;
-    character.   hp += 1; character.patk += 1; character.matk += 1;
-    character. pdef += 1; character.mdef += 1; character. spd += 1;    showDog()    ;    }
 
-</script></body></html>
+/* =========================
+   道路
+========================= */
+
+const roadPath = [
+    [2, 0],
+    [2, 1],
+    [2, 2],
+    [2, 3],
+    [2, 4],
+    [2, 5],
+    [2, 6]
+];
+
+
+/* =========================
+   建立地圖
+========================= */
+
+function createMap() {
+
+    const map = document.getElementById("map");
+
+    map.innerHTML = "";
+
+    for (let row = 0; row < ROWS; row++) {
+
+        for (let col = 0; col < COLS; col++) {
+
+            const cell = document.createElement("div");
+
+            cell.classList.add("cell");
+
+            const isRoad = roadPath.some(
+                position =>
+                    position[0] === row &&
+                    position[1] === col
+            );
+
+            if (isRoad) {
+                cell.classList.add("road");
+            }
+
+            cell.dataset.row = row;
+            cell.dataset.col = col;
+
+            cell.addEventListener("click", () => {
+                clickCell(row, col);
+            });
+
+            map.appendChild(cell);
+        }
+    }
+}
+
+
+/* =========================
+   點擊格子
+========================= */
+
+function clickCell(row, col) {
+
+    const tower = towers.find(
+        tower =>
+            tower.row === row &&
+            tower.col === col
+    );
+
+    if (tower) {
+        selectTower(tower);
+        return;
+    }
+
+    const isRoad = roadPath.some(
+        position =>
+            position[0] === row &&
+            position[1] === col
+    );
+
+    if (isRoad) {
+        document.getElementById("message").textContent =
+            "道路不能建造防禦塔！";
+        return;
+    }
+
+    if (gold < 30) {
+        document.getElementById("message").textContent =
+            "金幣不足！";
+        return;
+    }
+
+    buildTower(row, col);
+}
+
+
+/* =========================
+   建造塔
+========================= */
+
+function buildTower(row, col) {
+
+    gold -= 30;
+
+    const tower = {
+        row: row,
+        col: col,
+
+        level: 1,
+
+        damage: 4,
+
+        range: 2.2,
+
+        attackSpeed: 800,
+
+        lastAttack: 0
+    };
+
+    towers.push(tower);
+
+    document.getElementById("message").textContent =
+        "🏹 建造了一座弓箭塔！";
+
+    updateUI();
+    drawMap();
+}
+
+
+/* =========================
+   選擇塔
+========================= */
+
+function selectTower(tower) {
+
+    selectedTower = tower;
+
+    document.getElementById("upgrade").disabled = false;
+
+    document.getElementById("towerInfo").textContent =
+        `🏹 弓箭塔 Lv.${tower.level}　傷害 ${tower.damage}　範圍 ${tower.range}`;
+
+    document.getElementById("message").textContent =
+        "已選擇防禦塔";
+
+    drawMap();
+}
+
+
+/* =========================
+   升級塔
+========================= */
+
+function upgradeTower() {
+
+    if (!selectedTower) {
+        return;
+    }
+
+    const cost = selectedTower.level * 40;
+
+    if (gold < cost) {
+
+        document.getElementById("message").textContent =
+            `升級需要 ${cost} 金幣！`;
+
+        return;
+    }
+
+    gold -= cost;
+
+    selectedTower.level += 1;
+    selectedTower.damage += 3;
+    selectedTower.range += 0.3;
+
+    document.getElementById("message").textContent =
+        "⬆️ 防禦塔升級成功！";
+
+    document.getElementById("towerInfo").textContent =
+        `🏹 弓箭塔 Lv.${selectedTower.level}　傷害 ${selectedTower.damage}　範圍 ${selectedTower.range.toFixed(1)}`;
+
+    updateUI();
+    drawMap();
+}
+
+
+/* =========================
+   開始波次
+========================= */
+
+function startWave() {
+
+    if (waveRunning) {
+        return;
+    }
+
+    wave++;
+
+    waveRunning = true;
+
+    enemies = [];
+
+    document.getElementById("message").textContent =
+        `🌊 第 ${wave} 波開始！`;
+
+    let enemyCount = 5 + wave * 2;
+
+    for (let i = 0; i < enemyCount; i++) {
+
+        setTimeout(() => {
+
+            spawnEnemy();
+
+        }, i * 900);
+    }
+
+    setTimeout(() => {
+
+        waveRunning = false;
+
+    }, enemyCount * 900 + 1000);
+
+    updateUI();
+}
+
+
+/* =========================
+   生成敵人
+========================= */
+
+function spawnEnemy() {
+
+    const enemy = {
+
+        id: enemyId++,
+
+        pathIndex: 0,
+
+        hp: 10 + wave * 3,
+
+        maxHp: 10 + wave * 3,
+
+        speed: 0.0015 + wave * 0.0001,
+
+        progress: 0
+    };
+
+    enemies.push(enemy);
+}
+
+
+/* =========================
+   遊戲主循環
+========================= */
+
+function gameLoop(timestamp) {
+
+    updateEnemies();
+
+    updateTowers(timestamp);
+
+    drawMap();
+
+    requestAnimationFrame(gameLoop);
+}
+
+
+/* =========================
+   敵人移動
+========================= */
+
+function updateEnemies() {
+
+    for (let i = enemies.length - 1; i >= 0; i--) {
+
+        const enemy = enemies[i];
+
+        enemy.progress += enemy.speed;
+
+        if (enemy.progress >= 1) {
+
+            enemy.progress = 0;
+
+            enemy.pathIndex++;
+
+            if (enemy.pathIndex >= roadPath.length) {
+
+                life--;
+
+                enemies.splice(i, 1);
+
+                document.getElementById("message").textContent =
+                    "👾 有敵人突破防線！";
+
+                if (life <= 0) {
+
+                    gameOver();
+
+                    return;
+                }
+            }
+        }
+    }
+
+    updateUI();
+}
+
+
+/* =========================
+   防禦塔攻擊
+========================= */
+
+function updateTowers(timestamp) {
+
+    for (const tower of towers) {
+
+        if (timestamp - tower.lastAttack < tower.attackSpeed) {
+            continue;
+        }
+
+        const target = findTarget(tower);
+
+        if (!target) {
+            continue;
+        }
+
+        target.hp -= tower.damage;
+
+        tower.lastAttack = timestamp;
+
+        if (target.hp <= 0) {
+
+            const index = enemies.indexOf(target);
+
+            if (index !== -1) {
+
+                enemies.splice(index, 1);
+
+                gold += 10;
+
+                document.getElementById("message").textContent =
+                    "💰 擊敗敵人，獲得 10 金幣！";
+            }
+        }
+    }
+
+    updateUI();
+}
+
+
+/* =========================
+   尋找攻擊目標
+========================= */
+
+function findTarget(tower) {
+
+    let target = null;
+
+    let bestProgress = -1;
+
+    for (const enemy of enemies) {
+
+        const position = getEnemyPosition(enemy);
+
+        const towerX = tower.col;
+        const towerY = tower.row;
+
+        const distance = Math.sqrt(
+            Math.pow(position.x - towerX, 2) +
+            Math.pow(position.y - towerY, 2)
+        );
+
+        if (distance <= tower.range) {
+
+            if (enemy.pathIndex > bestProgress) {
+
+                bestProgress = enemy.pathIndex;
+
+                target = enemy;
+            }
+        }
+    }
+
+    return target;
+}
+
+
+/* =========================
+   敵人位置
+========================= */
+
+function getEnemyPosition(enemy) {
+
+    const current = roadPath[enemy.pathIndex];
+
+    const next = roadPath[enemy.pathIndex + 1];
+
+    if (!next) {
+
+        return {
+            x: current[1],
+            y: current[0]
+        };
+    }
+
+    return {
+
+        x: current[1] +
+            (next[1] - current[1]) * enemy.progress,
+
+        y: current[0] +
+            (next[0] - current[0]) * enemy.progress
+    };
+}
+
+
+/* =========================
+   畫面
+========================= */
+
+function drawMap() {
+
+    const cells = document.querySelectorAll(".cell");
+
+    cells.forEach(cell => {
+
+        cell.innerHTML = "";
+
+        cell.classList.remove("tower");
+        cell.classList.remove("selected");
+
+        const row = Number(cell.dataset.row);
+        const col = Number(cell.dataset.col);
+
+        const tower = towers.find(
+            tower =>
+                tower.row === row &&
+                tower.col === col
+        );
+
+        if (tower) {
+
+            cell.classList.add("tower");
+
+            cell.textContent = "🏹";
+
+            if (tower === selectedTower) {
+                cell.classList.add("selected");
+            }
+        }
+    });
+
+
+    for (const enemy of enemies) {
+
+        const position = getEnemyPosition(enemy);
+
+        const row = Math.round(position.y);
+        const col = Math.round(position.x);
+
+        const cell = document.querySelector(
+            `.cell[data-row="${row}"][data-col="${col}"]`
+        );
+
+        if (!cell) {
+            continue;
+        }
+
+        const enemyElement = document.createElement("div");
+
+        enemyElement.classList.add("enemy");
+
+        enemyElement.textContent = "👾";
+
+        const hpBar = document.createElement("div");
+
+        hpBar.classList.add("hp-bar");
+
+        const hpFill = document.createElement("div");
+
+        hpFill.classList.add("hp-fill");
+
+        hpFill.style.width =
+            `${Math.max(0, enemy.hp / enemy.maxHp * 100)}%`;
+
+        hpBar.appendChild(hpFill);
+
+        cell.appendChild(enemyElement);
+
+        cell.appendChild(hpBar);
+    }
+}
+
+
+/* =========================
+   UI
+========================= */
+
+function updateUI() {
+
+    document.getElementById("life").textContent = life;
+
+    document.getElementById("gold").textContent = gold;
+
+    document.getElementById("wave").textContent = wave;
+}
+
+
+/* =========================
+   Game Over
+========================= */
+
+function gameOver() {
+
+    waveRunning = false;
+
+    enemies = [];
+
+    document.getElementById("message").textContent =
+        "💀 防線失守！";
+
+    setTimeout(() => {
+
+        const restart = confirm(
+            "遊戲結束！\n\n要重新開始嗎？"
+        );
+
+        if (restart) {
+            location.reload();
+        }
+
+    }, 100);
+}
+
+
+/* =========================
+   按鈕
+========================= */
+
+document.getElementById("startWave")
+    .addEventListener("click", startWave);
+
+document.getElementById("upgrade")
+    .addEventListener("click", upgradeTower);
+
+
+/* =========================
+   啟動遊戲
+========================= */
+
+createMap();
+
+updateUI();
+
+requestAnimationFrame(gameLoop);
+
+</script>
+
+</body>
+</html>
